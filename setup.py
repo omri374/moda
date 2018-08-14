@@ -31,7 +31,7 @@ setuptools.setup(
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     long_description=README,
-    url='https://github.com/morsh/social-posts-pipeline',
+    url='https://github.com/omri374/moda',
     packages=setuptools.find_packages(),
     include_package_data=True,
     python_requires=">=3.5",
