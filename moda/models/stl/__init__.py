@@ -1,0 +1,1 @@
+from .stl_model import StlTrendinessDetector
