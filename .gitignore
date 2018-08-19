@@ -76,6 +76,10 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
+# pytest
+.pytest_cache/
+
+
 # exclude data from source control by default
 /data/
 

@@ -29,24 +29,30 @@ class TwitterAnomalyTrendinessDetector(AbstractTrendDetector):
     def fit_one_category(self, dataset, category=None, verbose=False):
         x = dataset['value']
 
-        model_result = anomaly_detect_ts(x, period=self.seasonality_freq, max_anoms=self.max_anoms,
-                                         direction=self.direction, alpha=self.alpha,
-                                         only_last=self.only_last, threshold=self.threshold, e_value=self.e_value,
-                                         longterm=self.longterm,
-                                         piecewise_median_period_weeks=self.piecewise_median_period_weeks)
+        try:
+            model_result = anomaly_detect_ts(x, period=self.seasonality_freq, max_anoms=self.max_anoms,
+                                             direction=self.direction, alpha=self.alpha,
+                                             only_last=self.only_last, threshold=self.threshold, e_value=self.e_value,
+                                             longterm=self.longterm,
+                                             piecewise_median_period_weeks=self.piecewise_median_period_weeks)
 
-        anomalies = model_result['anoms'].to_frame('anomalies')
+            anomalies = model_result['anoms'].to_frame('anomalies')
+            if 'anomalies' in dataset:
+                dataset = dataset.drop(columns=['anomalies'])
 
-        if 'anomalies' in dataset:
-            dataset = dataset.drop(columns=['anomalies'])
+            if len(anomalies) == 0:
+                dataset_with_pred = dataset
+                dataset_with_pred['anomalies'] = np.nan
+            else:
+                dataset_with_pred = pd.merge(dataset, anomalies, how='left', right_index=True, left_index=True)
 
-        if len(anomalies) == 0:
+            dataset_with_pred['prediction'] = np.where(np.isnan(dataset_with_pred['anomalies']), 0, 1)
+
+        except Exception as e:
+            print(e)
             dataset_with_pred = dataset
-            dataset_with_pred['anomalies'] = np.nan
-        else:
-            dataset_with_pred = pd.merge(dataset, anomalies, how='left', right_index=True, left_index=True)
+            dataset_with_pred['prediction'] = 0
 
-        dataset_with_pred['prediction'] = np.where(np.isnan(dataset_with_pred['anomalies']), 0, 1)
 
         if self.min_value is not None:
             dataset_with_pred['prediction'] = np.where(dataset_with_pred['value'] < self.min_value,0,dataset_with_pred['prediction'])

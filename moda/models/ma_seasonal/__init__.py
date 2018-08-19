@@ -1,0 +1,1 @@
+from .ma_seasonal_model import MovingAverageSeasonalTrendinessDetector

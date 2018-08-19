@@ -24,16 +24,19 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
         self.results = None
 
     def fit_one_category(self, dataset, category=None, verbose=False):
-        count_list = dataset['value'].values
+        values_list = dataset['value'].values
         dates_list = dataset.index.tolist()
+        print(category)
+        # print(dates_list)
         points = [{"Timestamp": date.strftime(format='%Y-%m-%dT%H:%M:%S'), "Value": count} for date, count in
-                  zip(dates_list, count_list)]
+                  zip(dates_list, values_list)]
 
         request_data = {}
         request_data["Points"] = points
 
         def detect(url, subscription_key, request_data):
             headers = {'Content-Type': 'application/json', 'Ocp-Apim-Subscription-Key': subscription_key}
+            print("calling " + str(url))
             response = requests.post(url, data=json.dumps(request_data), headers=headers)
             if response.status_code == 200:
                 return json.loads(response.content.decode("utf-8"))
@@ -41,34 +44,55 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
                 print(response.status_code)
                 raise Exception(response.text)
 
-        model_response = detect(self.endpoint, self.subscription_key, request_data)
+        try:
+            model_response = detect(self.endpoint, self.subscription_key, request_data)
+            results = pd.DataFrame(
+                {'expected': model_response['ExpectedValue'], 'prediction': model_response['IsAnomaly'],
+                 'is_anomaly_neg': model_response['IsAnomaly_Neg'],
+                 'is_anomaly_pos': model_response['IsAnomaly_Pos'],
+                 'upper': model_response['UpperMargin'],
+                 'lower': model_response['LowerMargin'], 'date': dates_list, 'value': values_list})
+            results['date'] = pd.to_datetime(results['date'])
+            results['prediction'] = np.where(results['prediction'], 1, 0)
 
-        results = pd.DataFrame({'expected': model_response['ExpectedValue'], 'is_anomaly': model_response['IsAnomaly'],
-                                'is_anomaly_neg': model_response['IsAnomaly_Neg'],
-                                'is_anomaly_pos': model_response['IsAnomaly_Pos'],
-                                'upper': model_response['UpperMargin'],
-                                'lower': model_response['LowerMargin'], 'date': dates_list})
+            ## Change prediction based on sensitivity
+            results = self.tune_prediction(results, self.sensitivity)
 
-        results = pd.merge(dataset, results, how='inner', on='date')
+            if self.min_value is not None:
+                results['prediction'] = np.where(results['value'] < self.min_value, 0,
+                                                 results['prediction'])
 
-        values = [x['Value'] for x in request_data['Points']]
-        anomalies = []
-        for (index, value) in results['is_anomaly'].iteritems():
-            if value > 0 and (
-                values[index] > results.iloc[index]['expected'] + self.sensitivity * results.iloc[index]['upper'] or
-                values[index] < results.iloc[index]['expected'] - self.sensitivity * results.iloc[index]['lower']):
-                anomalies.append(1)
-            else:
-                anomalies.append(0)
+            ## Set index
+            results = results.set_index(pd.DatetimeIndex(results['date'])).drop(columns='date')
 
-        results['prediction'] = anomalies
+        except Exception as e:
+            print(e)
+            results = dataset
+            results['prediction'] = 0
 
-        if self.min_value is not None:
-            results['prediction'] = np.where(results['value'] < self.min_value, 0,
-                                             results['prediction'])
 
         self.input_data[category] = results
 
+        return results
+
+    def tune_prediction(self, results, sensitivity):
+        anomalies = []
+        if self.sensitivity is not None:
+            for (index, value) in results['prediction'].iteritems():
+                if value > 0 and (
+                    results.iloc[index]['value'] > results.iloc[index]['expected'] + sensitivity *
+                    results.iloc[index][
+                        'upper']):
+                    anomalies.append(1)
+                elif value > 0 and (
+                    results.iloc[index]['value'] < results.iloc[index]['expected'] - sensitivity *
+                    results.iloc[index][
+                        'lower']):
+                    anomalies.append(-1)
+                else:
+                    anomalies.append(0)
+
+            results['prediction'] = anomalies
         return results
 
     def predict_one_category(self, X, category):

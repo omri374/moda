@@ -305,7 +305,7 @@ def _detect_anoms(data, k=0.49, alpha=0.05, num_obs_per_period=None,
     # validation
     assert num_obs_per_period, "must supply period length for time series decomposition"
     assert direction in ['pos', 'neg', 'both'], 'direction options: pos | neg | both'
-    #assert data.size >= num_obs_per_period * 2, 'Anomaly detection needs at least 2 periods worth of data'
+    assert data.size >= num_obs_per_period * 2, 'Anomaly detection needs at least 2 periods worth of data'
     assert data[data.isnull()].empty, 'Data contains NA. We suggest replacing NA with interpolated values before detecting anomaly'
 
     # conversion

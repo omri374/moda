@@ -5,8 +5,9 @@ import os
 import pandas as pd
 import pytest
 
-from moda.models.eval import eval_models, read_data, f_beta, get_metrics_with_shift, eval_models_CV
-from moda.models.stl import StlTrendinessDetector
+from moda.models.data_reader import read_data
+from moda.evaluators.eval import eval_models, f_beta, get_metrics_with_shift, eval_models_CV
+from moda.models.ma_seasonal import MovingAverageSeasonalTrendinessDetector
 from moda.test.mock_model import MockModel
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -70,7 +71,7 @@ def test_eval_models_half_false():
 def test_real_model():
 	path = os.path.join(THIS_DIR, os.pardir, 'test/dummy.txt')
 	df = read_data(path)
-	model = StlTrendinessDetector(is_multicategory=True, freq='12H')
+	model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq='12H')
 	models = [model]
 	X = df[['value']]
 	y = df[['is_anomaly']]

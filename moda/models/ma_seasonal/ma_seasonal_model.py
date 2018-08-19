@@ -1,14 +1,14 @@
 import traceback
 
 import numpy as np
-from stldecompose import decompose
+from statsmodels.tsa.seasonal import seasonal_decompose
 
 from moda.models.trend_detector import *
 
 
-class STLTrendinessDetector(AbstractTrendDetector):
-    __name__ = 'STLTrendinessDetector'
-    """An detector for anomalies on time series using the STL model (Seasonal and Trend decomposition using Loess)
+class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
+    __name__ = 'MovingAverageSeasonalTrendinessDetector'
+    """An detector for anomalies on time series using the seasonal_decompose method
 
     Parameters
     ----------
@@ -26,19 +26,16 @@ class STLTrendinessDetector(AbstractTrendDetector):
         The values on which anomalies are looked for. Possible values are 'trend','residual' and a list of both
     """
 
-    def __init__(self, freq, is_multicategory=True, lo_delta=0.01, lo_frac=0.6, num_of_std=3, seasonality_freq=7,
-                 min_value=None,
+    GENERAL_CATEGORY = 'general'
+
+    def __init__(self, freq, is_multicategory=True, num_of_std=3, seasonality_freq=7, min_value=None,
                  anomaly_type=['trend', 'residual', 'and', 'or'], resample=True, min_periods=10):
-        super(STLTrendinessDetector, self).__init__(freq, is_multicategory, resample)
-        self.lo_frac = lo_frac
-        self.lo_delta = lo_delta
+        super(MovingAverageSeasonalTrendinessDetector, self).__init__(freq, is_multicategory, resample)
         self.num_of_std = num_of_std
         self.min_value = min_value
         self.seasonality = seasonality_freq
         self.anomaly_type = anomaly_type
         self.min_periods = min_periods
-
-        self.HOURS_IN_NANOSECONDS = (1000000000 * 60 * 60)
 
     def fit_one_category(self, dataset, category=None, verbose=False):
         """Returns anomalies of the trend based on a k*sd heuristic
@@ -61,8 +58,10 @@ class STLTrendinessDetector(AbstractTrendDetector):
          """
 
         ts = dataset['value']
+        # labels = datasets['is_anomaly']
         results = pd.DataFrame(index=ts.index)
         results['value'] = ts
+        # results['labels'] = labels
         results['prediction'] = None
 
         if len(dataset) < MIN_SAMPLES_PER_CATEGORY:
@@ -72,13 +71,9 @@ class STLTrendinessDetector(AbstractTrendDetector):
             self.input_data[category] = results
             return results
 
+        # print(ts.index.freq)
         try:
-            diff = np.median(np.diff(ts.index))
-            diff_in_days = 24 / int(diff / self.HOURS_IN_NANOSECONDS)
-            print("Adjusted seasonality = " + str(int(self.seasonality * diff_in_days)))
-
-            decomposition = decompose(ts.values, period=int(self.seasonality * diff_in_days), lo_frac=self.lo_frac,
-                                      lo_delta=self.lo_delta)
+            decomposition = seasonal_decompose(ts.values, freq=self.seasonality)
         except ValueError as e:
             if verbose:
                 print(
@@ -98,27 +93,6 @@ class STLTrendinessDetector(AbstractTrendDetector):
         results['trend'] = trend
         results['residual'] = residual
         results['seasonality'] = seasonal
-
-        # decomposition_success = True
-        #
-        # if(np.all(np.isnan(residual))):
-        #     print("Failed to decompose time series")
-        #     decomposition_success = False
-        #
-        # if(np.all(np.isnan(seasonal))):
-        #     print("Failed to decompose seasonality from time series")
-        #     decomposition_success = False
-        #
-        # if(np.all(np.isnan(trend))):
-        #     print("Failed to decompose trend from time series")
-        #     decomposition_success = False
-        #
-        #
-        # if decomposition_success == False:
-        #     results['prediction'] = np.NaN
-        #     results['residual_anomaly'] = np.NaN
-        #     results['trend_anomaly'] = np.NaN
-        #     return results
 
         results['residual_median'] = results['residual'].rolling('30D', min_periods=self.min_periods).median()
         results['residual_std'] = results['residual'].rolling('30D', min_periods=self.min_periods).std()
