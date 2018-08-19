@@ -23,14 +23,22 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
         The seasonality of the data. See http://www.statsmodels.org/dev/generated/statsmodels.tsa.seasonal.seasonal_decompose.html
 
     anomaly_type: String
-        The values on which anomalies are looked for. Possible values are 'trend','residual' and a list of both
+        The values on which anomalies are looked for. Possible values are ['trend', 'residual', 'and', 'or']
+        
+    resample : bool
+        Whether to add missing dates/times to time series prior to modeling
+        
+    min_periods : numeric
+        The minimum value of periods for which to attemp to model. A time series shorter than that will return prediction = 0 
+
+    lookback : String
+        The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
     """
 
-    GENERAL_CATEGORY = 'general'
-
     def __init__(self, freq, is_multicategory=True, num_of_std=3, seasonality_freq=7, min_value=None,
-                 anomaly_type=['trend', 'residual', 'and', 'or'], resample=True, min_periods=10):
+                 anomaly_type='or', resample=True, min_periods=10, lookback='30D'):
         super(MovingAverageSeasonalTrendinessDetector, self).__init__(freq, is_multicategory, resample)
+        self.lookback = lookback
         self.num_of_std = num_of_std
         self.min_value = min_value
         self.seasonality = seasonality_freq
@@ -40,28 +48,37 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
     def fit_one_category(self, dataset, category=None, verbose=False):
         """Returns anomalies of the trend based on a k*sd heuristic
 
-         Parameters
-         ----------
-         dataset: pandas.DataFrame
-             A data frame containing a date/time index and 'value' column
+        Parameters
+        ----------
+        dataset: pandas.DataFrame
+            A data frame containing a date/time index and 'value' column
 
-         Returns
-         -------
-         df : pandas.DataFrame
-             Returns a pandas DataFrame with a date/time index, with these columns:
-                The seasonality decomposition:
-                - trend
-                - seasonality
-                - residual
-                A bool containing True if a trend anomaly was detected and False otherwise.
-                Note that the returned data frame fills the values of missing dates with 0.
-         """
+        category: String
+            Name of category for this dataset (optional).
+
+        verbose : bool
+            Print more to standard output
+
+        Returns
+        -------
+        df : pandas.DataFrame
+            Returns a pandas DataFrame with a date/time index, with these columns:
+               The seasonality decomposition:
+               - trend
+               - seasonality
+               - residual
+               A bool containing True if a trend anomaly was detected and False otherwise.
+               Note that the returned data frame fills the values of missing dates with 0.
+        """
+
+        assert self.anomaly_type in ['trend', 'residual', 'and',
+                                     'or'], "anomaly_type must one out of ['trend','residual','and','or']"
+        assert self.num_of_std > 0, "num_of_std must be a positive value"
 
         ts = dataset['value']
-        # labels = datasets['is_anomaly']
+
         results = pd.DataFrame(index=ts.index)
         results['value'] = ts
-        # results['labels'] = labels
         results['prediction'] = None
 
         if len(dataset) < MIN_SAMPLES_PER_CATEGORY:
@@ -71,7 +88,6 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
             self.input_data[category] = results
             return results
 
-        # print(ts.index.freq)
         try:
             decomposition = seasonal_decompose(ts.values, freq=self.seasonality)
         except ValueError as e:
@@ -94,11 +110,11 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
         results['residual'] = residual
         results['seasonality'] = seasonal
 
-        results['residual_median'] = results['residual'].rolling('30D', min_periods=self.min_periods).median()
-        results['residual_std'] = results['residual'].rolling('30D', min_periods=self.min_periods).std()
+        results['residual_median'] = results['residual'].rolling(self.lookback, min_periods=self.min_periods).median()
+        results['residual_std'] = results['residual'].rolling(self.lookback, min_periods=self.min_periods).std()
 
-        results['trend_median'] = results['trend'].rolling('30D', min_periods=self.min_periods).median()
-        results['trend_std'] = results['trend'].rolling('30D', min_periods=self.min_periods).std()
+        results['trend_median'] = results['trend'].rolling(self.lookback, min_periods=self.min_periods).median()
+        results['trend_std'] = results['trend'].rolling(self.lookback, min_periods=self.min_periods).std()
 
         results['residual_anomaly'] = np.where(
             residual > (results['residual_median'] + (results['residual_std'] * self.num_of_std)), 1, 0)
@@ -119,6 +135,8 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
         ## Remove predictions of values less than threshold
         if self.min_value is not None:
             results['prediction'] = np.where(results['value'] < self.min_value, 0, results['prediction'])
+
+        results['prediction'] = pd.to_numeric(results['prediction'])
 
         self.input_data[category] = results
         return results
@@ -165,31 +183,36 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
             plt.legend(loc='best')
             plt.xticks(rotation=90)
 
-        plt.subplot(421, )
-        ts_subplot(plt, self.input_data[category]['value'], label='Original')
-        plt.subplot(422)
-        ts_subplot(plt, self.input_data[category]['residual_anomaly'], label='Residual anomaly')
-        plt.subplot(423)
-        ts_subplot(plt, self.input_data[category]['trend'], label='Trend (stl)')
-        plt.subplot(424)
-        ts_subplot(plt, self.input_data[category]['trend_anomaly'], label='Trend anomaly')
-        plt.subplot(425)
-        ts_subplot(plt, self.input_data[category]['seasonality'], label='Seasonality')
-        plt.subplot(426)
-        ts_subplot(plt, self.input_data[category]['prediction'], label='Prediction')
-        plt.subplot(427)
-        ts_subplot(plt, self.input_data[category]['residual'], label='Residual')
+        if self.is_multicategory:
+            category_dataset = self.input_data[category]
+        else:
+            category_dataset = self.input_data['general']
 
-        if 'labels' in self.input_data[category]:
+        plt.subplot(421)
+        ts_subplot(plt, category_dataset['value'], label='Original')
+        plt.subplot(422)
+        ts_subplot(plt, category_dataset['residual_anomaly'], label='Residual anomaly')
+        plt.subplot(423)
+        ts_subplot(plt, category_dataset['trend'], label='Trend')
+        plt.subplot(424)
+        ts_subplot(plt, category_dataset['trend_anomaly'], label='Trend anomaly')
+        plt.subplot(425)
+        ts_subplot(plt, category_dataset['seasonality'], label='Seasonality')
+        plt.subplot(426)
+        ts_subplot(plt, category_dataset['prediction'], label='Prediction')
+        plt.subplot(427)
+        ts_subplot(plt, category_dataset['residual'], label='Residual')
+
+        if 'labels' in category_dataset:
             plt.subplot(428)
-            ts_subplot(plt, self.input_data[category]['labels'], label='Labels')
+            ts_subplot(plt, category_dataset['labels'], label='Labels')
         elif labels is not None:
             plt.subplot(428)
             ts_subplot(plt, labels, label='Labels')
 
         if category is None:
-            plt.suptitle("STL results for threshold (std)=" + str(
+            plt.suptitle("MA results for threshold (std)=" + str(
                 self.num_of_std) + ", seasonality_freq=" + str(self.seasonality) + ", freq=" + str(self.freq))
         else:
-            plt.suptitle("STL results for category " + category + ", threshold (std)=" + str(
+            plt.suptitle("MA results for category " + category + ", threshold (std)=" + str(
                 self.num_of_std) + ", seasonality_freq=" + str(self.seasonality) + ", freq=" + str(self.freq))

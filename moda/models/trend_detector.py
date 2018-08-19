@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 import pandas as pd
 
 MIN_SAMPLES_PER_CATEGORY = 5
-
+GENERAL_CATEGORY = 'general'
 
 class AbstractTrendDetector(ABC):
 
@@ -78,8 +78,8 @@ class AbstractTrendDetector(ABC):
             X = X.reset_index(level='category')
 
         if 'category' not in X:
-            self.fit_one_category(X, category=self.GENERAL_CATEGORY)
-            return self.predict_one_category(X, category=self.GENERAL_CATEGORY)
+            self.fit_one_category(X, category=GENERAL_CATEGORY)
+            return self.predict_one_category(X, category=GENERAL_CATEGORY)
 
         categories = X['category'].unique()
 
@@ -122,7 +122,7 @@ class AbstractTrendDetector(ABC):
             print("No data found")
 
         if len(self.input_data.keys()) == 1:
-            self.plot_one_category(self.GENERAL_CATEGORY)
+            self.plot_one_category(GENERAL_CATEGORY)
         else:
             categories = self.input_data.keys()
 
