@@ -53,7 +53,7 @@ class AbstractTrendDetector(ABC):
             X = X.set_index('date')
 
         if 'category' not in X:
-            return self.fit_one_category(X, category=self.GENERAL_CATEGORY, verbose=verbose)
+            return self.fit_one_category(X, category=GENERAL_CATEGORY, verbose=verbose)
 
         categories = X['category'].unique()
         for category in categories:
