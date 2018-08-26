@@ -94,10 +94,10 @@ class STLTrendinessDetector(AbstractTrendDetector):
 
         try:
             diff = np.median(np.diff(ts.index))
-            diff_in_days = 24 / int(diff / self.HOURS_IN_NANOSECONDS)
-            print("Adjusted seasonality = " + str(int(self.seasonality * diff_in_days)))
+            diff_in_days = float((np.int64(diff) / self.HOURS_IN_NANOSECONDS) / 24)
+            print("Adjusted seasonality = " + str(float(self.seasonality) / diff_in_days))
 
-            decomposition = decompose(ts.values, period=int(self.seasonality * diff_in_days), lo_frac=self.lo_frac,
+            decomposition = decompose(ts.values, period=int(self.seasonality / diff_in_days), lo_frac=self.lo_frac,
                                       lo_delta=self.lo_delta)
         except ValueError as e:
             if verbose:

@@ -9,11 +9,12 @@ from moda.evaluators.eval import get_evaluation_metrics, get_final_metrics, eval
 from moda.models.ma_seasonal.ma_seasonal_model import MovingAverageSeasonalTrendinessDetector
 from moda.models.stl.stl_model import STLTrendinessDetector
 from moda.models.twitter.anomaly_detect_multicategory import TwitterAnomalyTrendinessDetector
-
+import numpy as np
+import pandas as pd
 
 def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl', min_value=10):
     print("Loading file {0}, with frequency {1}. Model name = {2}".format(datapath, freq, model_name))
-    dataset = read_data(datapath)
+    dataset = read_data(datapath,min_date=min_date)
     dataset = dataset.rename(columns={'is_anomaly': 'label'})
 
     if len(dataset.index.levels) > 1:
@@ -66,7 +67,7 @@ def get_azure_subscription_key(file):
 
 
 def eval_model(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True):
-    dataset = read_data(datapath)
+    dataset = read_data(datapath,min_date=min_date)
     dataset = dataset[~dataset.index.duplicated(keep='first')]
     dataset = dataset.rename(columns={'is_anomaly': 'label'})
 
@@ -206,10 +207,11 @@ def log_experiment(datapath, dataset, model, parameters, metrics):
     experiment.log_parameter("dataset", datapath)
 
     for key, value in parameters.items():
-        experiment.log_parameter(key, value)
+            experiment.log_parameter(key, value)
 
     for key, value in metrics.items():
-        experiment.log_metric(key, value)
+        if ~np.isnan(value):
+            experiment.log_metric(key, value)
 
 
 if __name__ == '__main__':
@@ -222,7 +224,7 @@ if __name__ == '__main__':
     while city not in ['1', '2', '3', '9']:
         city = input("Select city: Corona (1), Pompano (2), SF (3), all (9):")
 
-    paths = {#'1': "datasets/corona_labeled.csv",
+    paths = {'1': "datasets/corona_labeled.csv",
              '2': "datasets/pompano_labeled.csv",
              '3': "datasets/SF30min_labeled.csv"}
 
