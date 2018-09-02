@@ -15,3 +15,19 @@ def test_ts_to_range():
     range = ts_to_range(ts, time_range='24H')
     assert 'category' in range.index.names
     assert 'date' in range.index.names
+
+
+def test_ts_to_range_no_categories():
+    path = os.path.join(THIS_DIR, os.pardir, 'test/sample-raw.csv')
+    raw = pd.read_csv(path)
+    ts = raw_to_ts(raw)
+    ts2 = ts[ts['category'] == 'A']
+    ts2 = ts2.drop(columns='category')
+    range = ts_to_range(ts2, time_range='24H')
+    assert 'category' not in range.index.names
+    assert 'date' in range.index.names
+
+
+if __name__ == '__main__':
+    test_ts_to_range()
+    test_ts_to_range_no_categories()
