@@ -12,6 +12,7 @@ from moda.models.twitter.anomaly_detect_multicategory import TwitterAnomalyTrend
 import numpy as np
 import pandas as pd
 
+
 def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl', min_value=10):
     print("Loading file {0}, with frequency {1}. Model name = {2}".format(datapath, freq, model_name))
     dataset = read_data(datapath,min_date=min_date)
@@ -215,6 +216,8 @@ def log_experiment(datapath, dataset, model, parameters, metrics):
 
 
 if __name__ == '__main__':
+
+    log_experiment("datapath",pd.DataFrame({"a":[1,2,3]}),STLTrendinessDetector("24H"),{"threshold":np.NaN},{"f1":np.NaN,"f0.5":np.NaN})
 
     inp1 = ''
     while inp1 not in ['r', 'e']:
