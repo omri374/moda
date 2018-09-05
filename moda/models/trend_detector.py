@@ -6,6 +6,7 @@ import pandas as pd
 MIN_SAMPLES_PER_CATEGORY = 5
 GENERAL_CATEGORY = 'general'
 
+
 class AbstractTrendDetector(ABC):
 
     @abstractmethod
@@ -129,7 +130,7 @@ class AbstractTrendDetector(ABC):
             category_count = 0
             for category in categories:
                 if labels is not None:
-                    if (isinstance(labels.index, pd.MultiIndex)):
+                    if isinstance(labels.index, pd.MultiIndex):
                         labels = labels.reset_index().set_index('date')
                     category_label = labels.loc[labels['category'] == category,]
                     category_label = category_label.drop(labels="category", axis=1)
@@ -140,8 +141,7 @@ class AbstractTrendDetector(ABC):
                 plt.figure(category_count, figsize=(20, 10))
                 self.plot_one_category(category=category, labels=category_label)
 
-
-                strFile = os.path.join(plots_path,self._type() + "-" + str(postfix) + "-" + category + ".png")
+                strFile = os.path.join(plots_path, self._type() + "-" + str(postfix) + "-" + category + ".png")
                 if os.path.isfile(strFile):
                     os.remove(strFile)
                 plt.savefig(strFile)

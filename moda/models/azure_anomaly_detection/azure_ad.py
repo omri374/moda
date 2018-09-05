@@ -26,7 +26,6 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
     def fit_one_category(self, dataset, category=None, verbose=False):
         values_list = dataset['value'].values
         dates_list = dataset.index.tolist()
-        print(category)
         # print(dates_list)
         points = [{"Timestamp": date.strftime(format='%Y-%m-%dT%H:%M:%S'), "Value": count} for date, count in
                   zip(dates_list, values_list)]
@@ -47,12 +46,13 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
         try:
             model_response = detect(self.endpoint, self.subscription_key, request_data)
             results = pd.DataFrame(
-                {'expected': model_response['ExpectedValue'], 'prediction': model_response['IsAnomaly'],
+                {'expected': model_response['ExpectedValue'], 'prediction_all': model_response['IsAnomaly'],
                  'is_anomaly_neg': model_response['IsAnomaly_Neg'],
                  'is_anomaly_pos': model_response['IsAnomaly_Pos'],
                  'upper': model_response['UpperMargin'],
                  'lower': model_response['LowerMargin'], 'date': dates_list, 'value': values_list})
             results['date'] = pd.to_datetime(results['date'])
+            results['prediction'] = results['is_anomaly_pos']
             results['prediction'] = np.where(results['prediction'], 1, 0)
 
             ## Change prediction based on sensitivity
@@ -69,7 +69,6 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
             print(e)
             results = dataset
             results['prediction'] = 0
-
 
         self.input_data[category] = results
 
@@ -128,6 +127,7 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
         fig, ax = plt.subplots(figsize=(20, 10))
 
         dataset = self.input_data[category]
+        dataset = dataset.reset_index()
         dates = dataset['date']
         values = dataset['value']
         prediction = dataset['prediction']
