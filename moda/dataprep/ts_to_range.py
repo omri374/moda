@@ -21,7 +21,4 @@ def ts_to_range(ts, time_range='1H'):
     else:
         range_grp = ts.groupby(pd.TimeGrouper(time_range)).agg('count')
 
-    # Fill all the missing ranges with zeros
-    range_grp = range_grp.resample(time_range, convention='start').asfreq().fillna(0)
-
     return range_grp

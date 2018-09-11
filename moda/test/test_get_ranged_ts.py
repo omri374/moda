@@ -12,7 +12,7 @@ def test_raw_to_ts():
     path = os.path.join(THIS_DIR, os.pardir, 'test/sample-raw.csv')
     raw = pd.read_csv(path)
     ts = raw_to_ts(raw)
-    assert isinstance(ts.index,pd.DatetimeIndex)
+    assert isinstance(ts.index, pd.DatetimeIndex)
 
 
 def test_raw_to_ts_no_date():
@@ -24,12 +24,7 @@ def test_raw_to_ts_no_date():
         raw_to_ts(ts)
 
 
-
 def test_ts_to_range():
     path = os.path.join(THIS_DIR, os.pardir, 'test/sample-raw.csv')
     raw = pd.read_csv(path)
     ts = raw_to_ts(raw)
-
-
-
-

@@ -1,130 +1,85 @@
-"""
-Contributions from:
-DSEverything - Mean Mix - Math, Geo, Harmonic (LB 0.493)
-https://www.kaggle.com/dongxu027/mean-mix-math-geo-harmonic-lb-0-493
-JdPaletto - Surprised Yet? - Part2 - (LB: 0.503)
-https://www.kaggle.com/jdpaletto/surprised-yet-part2-lb-0-503
-hklee - weighted mean comparisons, LB 0.497, 1ST
-https://www.kaggle.com/zeemeen/weighted-mean-comparisons-lb-0-497-1st
+# import comet_ml in the top of your file
+from comet_ml import Experiment
 
-Also all comments for changes, encouragement, and forked scripts rock
-I've added my own model and used the prepared data by other awesoem kagglers!
+# Add the following code anywhere in your machine learning file
+from moda.example.example import prep_data
 
-Keep the Surprise Going
-"""
+experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrMbFobYDZRRA4tvoYiR",
+                        project_name="keras-lstm-sf311-forecast", workspace="omri374")
 
-import numpy as np
 import pandas as pd
-from keras.layers import TimeDistributed
-from keras.losses import mean_squared_error
 
-from moda.evaluators.eval import _prep_set
-from moda.evaluators.metrics.metrics import _initialize_metrics
+from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.models import read_data
 
 
-def lstm(X, y):
-    from keras.layers import LSTM, Dense
+def lstm_forecast(window_size):
+    from keras.layers.recurrent import LSTM
     from keras.models import Sequential
-    from matplotlib import pyplot as plt
-    from sklearn.preprocessing import StandardScaler
-    from math import floor
+    from keras.layers import Conv1D
+    from keras.layers.core import Dense, Activation
 
-    datetimeindex = X.index.levels[0]
-    num_dates = len(datetimeindex)
-    train_percent = 70
-
-    train = datetimeindex[:int(num_dates * train_percent / 100)]
-    test = datetimeindex[int(num_dates * train_percent / 100):]
-    categories = X.index.levels[1]
-
-    counter = 0
-    metrics = _initialize_metrics(categories)
-
-    x_train = _prep_set(X, train)
-    y_train = _prep_set(y, train)
-
-    x_test = _prep_set(X, test)
-    y_test = _prep_set(y, test)
-
-    # Define the scaler
-    scaler = StandardScaler().fit(x_train)
-    # scaler = MinMaxScaler().fit(x_train)
-
-    # Scale the train set
-    x_train = scaler.transform(x_train)
-
-    # Scale the test set
-    x_test = scaler.transform(x_test)
-
-    # Set random seed
-    np.random.seed(7)
-
-    print("--- shape report ---")
-    print("x_train: ", x_train.shape)
-    print("y_train: ", y_train.shape)
-    print("x_test: ", x_test.shape)
-
-    # split the training for validation
-    rate = 1.0
-    train_sample_size = floor(x_train.shape[0] * rate)
-    # commented out the validation
-    # y_valid = np.copy(x_train[train_sample_size:,:])
-    # y_valid = np.copy(y_train[train_sample_size:])
-    x_train = x_train[:train_sample_size, :]
-    y_train = y_train[:train_sample_size]
-
-    x_train = x_train.reshape((x_train.shape[0], 1, x_train.shape[1]))
-    # x_valid = x_valid.reshape((x_valid.shape[0], 1, x_valid.shape[1]))
-    x_test = x_test.reshape((x_test.shape[0], 1, x_test.shape[1]))
-
-    print("-- network input --")
-    print("X_train: ", x_train.shape)
-    print("y_train: ", y_train.shape)
-    # print("X_valid: ", x_valid.shape)
-    # print("y_valid: ", y_valid.shape)
-    print("X_test: ", x_test.shape)
-
-    # design network
     model = Sequential()
-    model.add(LSTM(100, input_shape=(x_train.shape[1], x_train.shape[2])))
-    model.add(TimeDistributed())
+    model.add(Conv1D(input_shape=(window_size, 1), filters=32, kernel_size=10))
+    model.add(LSTM(output_dim=window_size, return_sequences=True))
+    model.add(LSTM(32, return_sequences=False))
     model.add(Dense(1))
-    model.compile(loss='mse', optimizer='adam')
+    model.add(Activation("linear"))
+    model.compile(loss="mse", optimizer="adam")
+    print(model.summary())
 
-    # fit network
-    # history = model.fit(x_train, y_train, epochs=10, batch_size=1000, \
-    # validation_data=(x_valid, y_valid), verbose=2, shuffle=False)
-    history = model.fit(x_train, y_train, epochs=60, batch_size=50, verbose=2, shuffle=False)
+    return model
 
-    # plot history
-    plt.plot(history.history['loss'], label='train')
-    # plt.plot(history.history['val_loss'], label='test')
-    plt.legend()
-    plt.show()
 
-    # make a prediction for test data
-    yhat = model.predict(x_test)
-    # yhat = model.predict(x_valid)
-    # yhat = model.predict(x_train)
-    visitors = np.absolute(np.expm1(yhat))
-    x_test['visitors'] = visitors
-    #x_test[['id', 'visitors']].to_csv('submission_10.csv', index=False, float_format='%.3f')
+def scale(X):
+    from sklearn.preprocessing import MinMaxScaler
 
-    # calculate RMSE for the validation set
-    # rmse = np.sqrt(mean_squared_error(yhat, y_valid))
-    rmse = np.sqrt(mean_squared_error(yhat, y_train))
-    print('Test RMSE: %.3f' % rmse)
+    scaler = MinMaxScaler(feature_range=(-1, 1))
+
+    scaled_values = scaler.fit_transform(X['value'].values.reshape(-1, 1))
+    scaled = pd.DataFrame(index=X.index)
+    scaled['value'] = scaled_values
+
+    return scaled
 
 
 if __name__ == '__main__':
-    datapath = "../../datasets/corona_labeled.csv"
-    df = read_data(datapath, min_date="01-01-2018")
-    df = df.rename(columns={'is_anomaly': 'label'})
+    datapath = "../../example/SF311_simplified.csv"
+    df = prep_data(datapath, min_date="01-01-2018")
+    #df = df.rename(columns={'is_anomaly': 'label'})
 
-    one_category = df.loc[pd.IndexSlice[:, 'housing'], :]#.reset_index(level='category', drop=True)
+    one_category = df.loc[pd.IndexSlice[:, 'Street and Sidewalk Cleaning'], :].reset_index(level='category', drop=True)
+    one_category_scaled = scale(one_category)
 
-    X = one_category[['value']]
-    y = one_category[['label']]
+    train_percent = 70
+    datetimeindex = one_category_scaled.index
+    num_dates = len(datetimeindex)
 
-    lstm(X, y)
+    train = one_category_scaled.loc[datetimeindex[:int(num_dates * train_percent / 100)]]
+    test = one_category_scaled.loc[datetimeindex[int(num_dates * train_percent / 100):]]
+
+    print("Training set length = {0}, Test set length = {1}".format(len(train), len(test)))
+
+    as_windows_train = get_windowed_ts(train, window_size=20)
+    as_windows_test = get_windowed_ts(test, window_size=20)
+    train_X, train_y = split_history_and_current(as_windows_train)
+    test_X, test_y = split_history_and_current(as_windows_test)
+
+    train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
+    test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
+    model = lstm_forecast(window_size=20)
+
+    import time
+
+    start = time.time()
+    model.fit(train_X, train_y, batch_size=256, epochs=3, validation_split=0.1)
+    print("> Compilation Time : ", time.time() - start)
+
+    # Doing a prediction on all the test data at once
+    preds = model.predict(test_X)
+
+    from sklearn.metrics import mean_squared_error
+
+    actual = test_y
+    prediction = preds
+    print("MSE=" + str(mean_squared_error(actual, prediction)))
