@@ -1,7 +1,7 @@
 # import comet_ml in the top of your file
 from comet_ml import Experiment
 
-# Add the following code anywhere in your machine learning file
+from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.example.example import prep_data
 
 experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrMbFobYDZRRA4tvoYiR",
@@ -9,8 +9,6 @@ experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrM
 
 import pandas as pd
 
-from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
-from moda.models import read_data
 
 
 def lstm_forecast(window_size):
