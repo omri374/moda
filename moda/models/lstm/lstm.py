@@ -11,7 +11,6 @@ experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrM
 import pandas as pd
 
 
-
 def lstm_forecast(window_size):
     from keras.layers.recurrent import LSTM
     from keras.models import Sequential
@@ -45,13 +44,18 @@ def scale(X):
 
 if __name__ == '__main__':
     datapath = "moda/example/SF311_simplified.csv"
-    df = prep_data(datapath, min_date="01-01-2018")
-    #df = df.rename(columns={'is_anomaly': 'label'})
+    category = "Streen and Sidewalk Cleaning"
+    train_percent = 70
+    window_size = 100
+    start_date = "01-01-2017"
+    end_date = "01-01-2018"
 
-    one_category = df.loc[pd.IndexSlice[:, 'Street and Sidewalk Cleaning'], :].reset_index(level='category', drop=True)
+    df = prep_data(datapath, max_date=end_date, min_date=start_date)
+
+    one_category = df.loc[pd.IndexSlice[:, category], :]. \
+        reset_index(level='category', drop=True)
     one_category_scaled = scale(one_category)
 
-    train_percent = 70
     datetimeindex = one_category_scaled.index
     num_dates = len(datetimeindex)
 
@@ -60,19 +64,19 @@ if __name__ == '__main__':
 
     print("Training set length = {0}, Test set length = {1}".format(len(train), len(test)))
 
-    as_windows_train = get_windowed_ts(train, window_size=20)
-    as_windows_test = get_windowed_ts(test, window_size=20)
+    as_windows_train = get_windowed_ts(train, window_size=window_size)
+    as_windows_test = get_windowed_ts(test, window_size=window_size)
     train_X, train_y = split_history_and_current(as_windows_train)
     test_X, test_y = split_history_and_current(as_windows_test)
 
     train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
     test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
-    model = lstm_forecast(window_size=20)
+    model = lstm_forecast(window_size=window_size)
 
     import time
 
     start = time.time()
-    model.fit(train_X, train_y, batch_size=256, epochs=3, validation_split=0.1)
+    model.fit(train_X, train_y, batch_size=128, epochs=9, validation_split=0.1)
     print("> Compilation Time : ", time.time() - start)
 
     # Doing a prediction on all the test data at once
@@ -82,4 +86,6 @@ if __name__ == '__main__':
 
     actual = test_y
     prediction = preds
-    print("MSE=" + str(mean_squared_error(actual, prediction)))
+    mse = mean_squared_error(actual, prediction)
+    print("MSE=" + str(mse))
+    experiment.log_metric("mse",str(mse))
