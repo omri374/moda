@@ -1,5 +1,6 @@
 # import comet_ml in the top of your file
 from comet_ml import Experiment
+from keras.layers import BatchNormalization
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.example.example import prep_data
@@ -19,6 +20,7 @@ def lstm_forecast(window_size):
 
     model = Sequential()
     model.add(Conv1D(input_shape=(window_size, 1), filters=32, kernel_size=10))
+    model.add(BatchNormalization())
     model.add(LSTM(output_dim=window_size, return_sequences=True))
     model.add(LSTM(32, return_sequences=False))
     model.add(Dense(1))
@@ -42,7 +44,7 @@ def scale(X):
 
 
 if __name__ == '__main__':
-    datapath = "../../example/SF311_simplified.csv"
+    datapath = "moda/example/SF311_simplified.csv"
     df = prep_data(datapath, min_date="01-01-2018")
     #df = df.rename(columns={'is_anomaly': 'label'})
 
