@@ -116,7 +116,7 @@ class AbstractTrendDetector(ABC):
     def _type(self):
         return self.__class__.__name__
 
-    def plot(self, labels=None, postfix="", plots_path="plots/"):
+    def plot(self, labels=None, savefig=True, postfix="", plots_path="plots/"):
         import matplotlib.pyplot as plt
 
         if self.input_data is None:
@@ -141,7 +141,8 @@ class AbstractTrendDetector(ABC):
                 plt.figure(category_count, figsize=(20, 10))
                 self.plot_one_category(category=category, labels=category_label)
 
-                strFile = os.path.join(plots_path, self._type() + "-" + str(postfix) + "-" + category + ".png")
-                if os.path.isfile(strFile):
-                    os.remove(strFile)
-                plt.savefig(strFile)
+                if savefig:
+                    strFile = os.path.join(plots_path, self._type() + "-" + str(postfix) + "-" + category + ".png")
+                    if os.path.isfile(strFile):
+                        os.remove(strFile)
+                    plt.savefig(strFile)

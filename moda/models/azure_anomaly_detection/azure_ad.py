@@ -144,9 +144,9 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
         ax.plot(dates, values, label='Value', linestyle="-")
         if ~np.all(prediction == 0):
             mask = (~np.isnan(prediction)) & (prediction != 0)
-            ax.plot(dates[mask], values[mask], marker='o', color='r', label='Prediction')
+            ax.plot_date(dates[mask], values[mask], marker='o', color='r', label='Prediction')
             # ax.plot(dates, values, marker='o', color='r')
-        ax.plot(dates, expected, label='Expected', linestyle=':')
+        ax.plot_date(dates, expected, label='Expected', linestyle=':')
         ax.plot(dates, expected + self.sensitivity * upper, label='Upper', linestyle='-.',
                 linewidth=1)
         ax.plot(dates, expected - self.sensitivity * lower, label='Lower', linestyle='-.',
@@ -161,7 +161,7 @@ class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
             mask = (~np.isnan(labels_padded['label'])) & (labels_padded['label'] != 0)
             true_labels = labels_padded.loc[mask]
             if len(true_labels) > 0:
-                ax.plot(true_labels['date'], true_labels['value'], label='Labels', marker='x',
+                ax.plot_date(true_labels['date'], true_labels['value'], label='Labels', marker='x',
                         color='b')
 
         if category is None:

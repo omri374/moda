@@ -17,7 +17,13 @@ def read_data(path, min_date=None, max_date=None):
             per-window, and a single column of a numeric dtype, giving said
             frequency.
      """
+
+    import os.path
+    if not os.path.exists(path):
+        raise FileNotFoundError
+
     df = pd.read_csv(path, index_col=None)
+
     df['date'] = pd.to_datetime(df['date'])
     if min_date is not None:
         df = df[df['date'] >= min_date]

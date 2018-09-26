@@ -78,10 +78,8 @@ def eval_model(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', us
     X = dataset[['value']]
     y = dataset[['label']]
 
-
-
     if 'H' in freq:
-        min_value = 15
+        min_value = 10
     else:
         min_value = 8
 
@@ -239,24 +237,30 @@ if __name__ == '__main__':
     while city not in ['1', '2', '3', '9']:
         city = input("Select city: Corona (1), Pompano (2), SF (3), all (9):")
 
-    paths = {'1': "datasets/corona_labeled.csv",
-             '2': "datasets/pompano_labeled.csv",
-             '3': "datasets/SF30min_labeled.csv"}
+    freq = 0
+    while freq not in ['1', '2', '3','4']:
+        freq = input("Select time frequency: 30min (1), 1H (2), 12H (3) or 24H (4)")
 
-    freqs = {'1': '12H', '2': '24H', '3': '30min'}
+
+    freqs = {'1': '30min', '2': '1H', '3': '12H','4':'24H'}
     cities = {'1': 'Corona', '2': 'Pompano', '3': 'SF'}
     models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure'}
 
+    if cities != 9:
+        datapath = "datasets/{0}{1}_labeled.csv".format(cities[city],freqs[freq])
+
+
     if inp1 == 'r':
         model = input("Select model: Moving Averages (m), STL (s), Twitter (t), Azure Anomaly Detector (a):")
-        prediction = run_model(datapath=paths[city], freq=freqs[city], model_name=models[model])
+        prediction = run_model(datapath=datapath, freq=freqs[city], model_name=models[model])
         prediction.to_csv(cities[city] + '-' + models[model] + '-prediction.csv')
     if inp1 == 'e':
         if city == '9':
             print("Evaluating all cities")
             # eval_model(datapath="../test/dummy3.txt", freq='12H',use_comet=False)
-            for val, freq in zip(paths, freqs):
-                eval_model(datapath=paths[val], freq=freqs[freq], use_comet=True)
+            for city, freq in zip(cities, freqs):
+                datapath = "datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
+                eval_model(datapath=datapath, freq=freqs[freq], use_comet=True)
         else:
-            print("Loading file {0}, with frequency {1}. Evaluating all models".format(paths[city], freqs[city]))
-            eval_model(datapath=paths[city], freq=freqs[city])
+            print("Loading file {0}. Evaluating all models".format(datapath))
+            eval_model(datapath=datapath, freq=freqs[freq])
