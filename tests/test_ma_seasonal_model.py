@@ -9,7 +9,7 @@ THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_single_category():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy4.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'tests/data/dummy4.txt')
     df = read_data(path)
     one_category = df.loc[pd.IndexSlice[:, 'housing'], :].reset_index(level='category', drop=True)
     ma = MovingAverageSeasonalTrendinessDetector(freq='12H', is_multicategory=False, anomaly_type='or')
@@ -18,7 +18,7 @@ def test_single_category():
 
 
 def test_two_categories():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy4.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'tests/data/dummy4.txt')
     df = read_data(path)
     ma = MovingAverageSeasonalTrendinessDetector(freq='12H', anomaly_type='or', lookback='5D')
     prediction = ma.predict(df)
@@ -26,14 +26,14 @@ def test_two_categories():
 
 
 def test_two_categories_high_std():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy4.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'tests/data/dummy4.txt')
     df = read_data(path)
     ma = MovingAverageSeasonalTrendinessDetector(freq='12H', anomaly_type='or', lookback='5D',num_of_std=50)
     prediction = ma.predict(df)
     assert len(prediction[prediction['prediction'] == 1]) == 0
 
 def test_two_categories_high_min_value():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy4.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'tests/data/dummy4.txt')
     df = read_data(path)
     ma = MovingAverageSeasonalTrendinessDetector(freq='12H', anomaly_type='or', lookback='5D',min_value=2000)
     prediction = ma.predict(df)

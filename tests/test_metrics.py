@@ -4,9 +4,6 @@ import os
 from moda.evaluators.eval import get_metrics_with_shift
 from moda.evaluators.metrics.metrics import f_beta
 
-THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
 def test_f_beta1():
     precision = 0.6
     recall = 1.0

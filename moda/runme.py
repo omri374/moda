@@ -257,7 +257,7 @@ if __name__ == '__main__':
     if inp1 == 'e':
         if city == '9':
             print("Evaluating all cities")
-            # eval_model(datapath="../test/dummy3.txt", freq='12H',use_comet=False)
+            # eval_model(datapath="../tests/dummy3.txt", freq='12H',use_comet=False)
             for city, freq in zip(cities, freqs):
                 datapath = "datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
                 eval_model(datapath=datapath, freq=freqs[freq], use_comet=True)
