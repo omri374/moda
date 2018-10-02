@@ -4,7 +4,7 @@ from moda.dataprep.raw_to_ts import raw_to_ts
 from moda.dataprep.ts_to_range import ts_to_range
 
 
-def raw_to_timeseries(datapath, time_range='30min', nrows=None, min_date=None, max_date=None, save_files=False):
+def prep_data(datapath, time_range='30min', nrows=None, min_date=None, max_date=None, save_files=False):
     """
     Take a raw data with timestamps (date column), categories (category column) and additional columns,
     and turn it into a ranged time-series: Group the original raw data by time interval (time_range) and category.
@@ -42,5 +42,6 @@ def raw_to_timeseries(datapath, time_range='30min', nrows=None, min_date=None, m
             ranged_ts.to_csv("ranged_ts_SF311_" + str(nrows) + "_rows.csv")
     return ranged_ts
 
+
 if __name__ == '__main__':
-    range = raw_to_timeseries('SF311_simplified.csv')
+    range = prep_data('SF311_simplified.csv', nrows=1000)
