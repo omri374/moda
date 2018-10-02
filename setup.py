@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='moda',
-    version='0.0.3',
+    version='0.0.4',
     packages=['moda.dataprep',
               'moda.evaluators', 'moda.evaluators.metrics',
               'moda.models', 'moda.models.twitter', 'moda.models.ma_seasonal', 'moda.models.stl'

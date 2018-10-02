@@ -12,7 +12,6 @@ def test_create_windowed_df():
 
     assert len(windowed_df.columns) == 3
 
-
     assert windowed_df.iloc[0, 0] == 0
     assert windowed_df.iloc[0, 1] == 1
     assert windowed_df.iloc[0, 2] == 2

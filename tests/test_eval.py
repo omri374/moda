@@ -8,13 +8,13 @@ import pytest
 from moda.evaluators.eval import eval_models, eval_models_CV
 from moda.models.data_reader import read_data
 from moda.models.ma_seasonal import MovingAverageSeasonalTrendinessDetector
-from moda.test.mock_model import MockModel
+from test.mock_model import MockModel
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 
 
 def test_read_data():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy.txt')
     df = read_data(path)
     index = df.index
     # assert index is pd.MultiIndex
@@ -23,7 +23,7 @@ def test_read_data():
 
 
 def test_eval_models_all_true():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy2.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy2.txt')
     df = read_data(path)
 
     model = MockModel()
@@ -38,7 +38,7 @@ def test_eval_models_all_true():
 
 
 def test_eval_models_all_false():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy.txt')
     df = read_data(path)
     df['is_anomaly'] = 0
 
@@ -53,7 +53,7 @@ def test_eval_models_all_false():
 
 
 def test_eval_models_half_false():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy2.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy2.txt')
     df = read_data(path)
     df['is_anomaly'] = 0
     df.iloc[-1]['is_anomaly'] = 1
@@ -69,7 +69,7 @@ def test_eval_models_half_false():
 
 
 def test_real_model():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy.txt')
     df = read_data(path)
     model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq='12H')
     models = [model]
@@ -94,7 +94,7 @@ def test_X_None():
 
 
 def test_y_None():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy.txt')
     df = read_data(path)
     X = df[['value']]
     y = None
@@ -106,7 +106,7 @@ def test_y_None():
 
 
 def test_n_splits_big():
-    path = os.path.join(THIS_DIR, os.pardir, 'test/dummy2.txt')
+    path = os.path.join(THIS_DIR, os.pardir, 'test/data/dummy2.txt')
     df = read_data(path)
 
     model = MockModel()
