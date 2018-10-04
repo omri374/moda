@@ -1,5 +1,10 @@
+## Notice: this is still WIP and not working as a part of the moda framework
+
 # import comet_ml in the top of your file
 from comet_ml import Experiment
+from keras import Sequential
+from keras.callbacks import EarlyStopping
+from keras.layers import LSTM, Dense, Activation
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.example.example import prep_data
@@ -9,6 +14,8 @@ experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrM
                         project_name="keras-lstm-sf311-forecast", workspace="omri374")
 
 import pandas as pd
+
+
 
 
 class LSTMTrendinessDetector(AbstractTrendDetector):
@@ -49,37 +56,44 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         self.min_periods = min_periods
         self.window_size = window_size
 
+    def lstm_forecast_model(self, window_size,verbose=False):
+        model = Sequential()
+        # model.add(Conv1D(input_shape=(window_size, 1), filters=32, kernel_size=10))
+        # model.add(MaxPooling1D(pool_size=5))
+        model.add(LSTM(input_shape=(window_size, 1), output_dim=window_size, return_sequences=True))
+        model.add(LSTM(128, return_sequences=False))
+        model.add(Dense(1))
+        model.add(Activation("linear"))
+        model.compile(loss="mse", optimizer="adam")
+        if verbose:
+            print(model.summary())
 
-def fit(self, X, y=None, verbose=False):
+        return model
 
-    X_scaled = scale(X)
+    def fit_one_category(self,dataset,verbose=False):
+        one_category_scaled = scale(dataset)
 
+        datetimeindex = one_category_scaled.index
+        num_dates = len(datetimeindex)
 
-    ts = get_windowed_ts(X_scaled)
-    train_X, train_y = split_history_and_current(ts)
+        train = one_category_scaled.loc[datetimeindex[:int(num_dates * train_percent / 100)]]
+        test = one_category_scaled.loc[datetimeindex[int(num_dates * train_percent / 100):]]
 
+        as_windows_train = get_windowed_ts(train, window_size=window_size)
+        as_windows_test = get_windowed_ts(test, window_size=window_size)
+        train_X, train_y = split_history_and_current(as_windows_train)
+        test_X, test_y = split_history_and_current(as_windows_test)
 
+        train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
+        test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
 
+        model = self.lstm_forecast_model(window_size=window_size,verbose=verbose)
 
+        start = time.time()
+        model.fit(train_X, train_y, batch_size=256, epochs=10, validation_split=0.1,
+                  callbacks=[EarlyStopping(patience=2)])
+        print("> Compilation Time : ", time.time() - start)
 
-
-
-def lstm_forecast_model(window_size):
-    from keras.layers.recurrent import LSTM
-    from keras.models import Sequential
-    from keras.layers.core import Dense, Activation
-
-    model = Sequential()
-    # model.add(Conv1D(input_shape=(window_size, 1), filters=32, kernel_size=10))
-    # model.add(MaxPooling1D(pool_size=5))
-    model.add(LSTM(input_shape=(window_size, 1), output_dim=window_size, return_sequences=True))
-    model.add(LSTM(128, return_sequences=False))
-    model.add(Dense(1))
-    model.add(Activation("linear"))
-    model.compile(loss="mse", optimizer="adam")
-    model.summary()
-
-    return model
 
 def scale(X):
     from sklearn.preprocessing import MinMaxScaler
