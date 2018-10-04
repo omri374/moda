@@ -2,10 +2,10 @@ from setuptools import setup
 
 setup(
     name='moda',
-    version='0.0.5',
+    version='0.0.7',
     packages=['moda.dataprep',
               'moda.evaluators', 'moda.evaluators.metrics',
-              'moda.models', 'moda.models.twitter', 'moda.models.ma_seasonal', 'moda.models.stl'
+              'moda.models', 'moda.models.twitter','moda.models.azure_anomaly_detection', 'moda.models.lstm', 'moda.models.ma_seasonal', 'moda.models.stl'
               ],
     url='https://www.github.com/omri374/moda',
     license='MIT',
