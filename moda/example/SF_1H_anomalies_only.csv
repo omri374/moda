@@ -1,0 +1,293 @@
+,Unnamed: 0,date,category,value
+0,482,2018-01-30 08:00:00,Abandoned Vehicle,16
+1,483,2018-01-30 09:00:00,Abandoned Vehicle,21
+2,528,2018-02-01 17:00:00,Abandoned Vehicle,18
+3,586,2018-02-05 08:00:00,Abandoned Vehicle,18
+4,716,2018-02-12 15:00:00,Abandoned Vehicle,16
+5,717,2018-02-12 16:00:00,Abandoned Vehicle,20
+6,850,2018-02-20 09:00:00,Abandoned Vehicle,16
+7,867,2018-02-21 09:00:00,Abandoned Vehicle,19
+0,352,2018-05-20 00:00:00,Abandoned Vehicle,35
+1,737,2018-06-11 09:00:00,Abandoned Vehicle,26
+0,320,2018-03-19 10:00:00,Abandoned Vehicle,19
+1,966,2018-04-25 08:00:00,Abandoned Vehicle,20
+2,988,2018-04-26 12:00:00,Abandoned Vehicle,19
+0,759,2018-08-09 12:00:00,Abandoned Vehicle,25
+1,826,2018-08-13 09:00:00,Abandoned Vehicle,21
+0,20,2018-01-03 20:00:00,Blocked Street or SideWalk,10
+1,31,2018-01-04 22:00:00,Blocked Street or SideWalk,10
+2,63,2018-01-08 22:00:00,Blocked Street or SideWalk,11
+3,150,2018-01-18 09:00:00,Blocked Street or SideWalk,15
+4,438,2018-02-21 19:00:00,Blocked Street or SideWalk,10
+5,462,2018-02-24 11:00:00,Blocked Street or SideWalk,20
+6,1183,2018-05-20 17:00:00,Blocked Street or SideWalk,10
+7,1348,2018-06-15 19:00:00,Blocked Street or SideWalk,12
+8,1423,2018-06-28 12:00:00,Blocked Street or SideWalk,19
+0,8,2018-01-05 10:00:00,Construction Zone Permits,12
+1,234,2018-02-22 12:00:00,Construction Zone Permits,15
+2,318,2018-03-13 12:00:00,Construction Zone Permits,13
+0,306,2018-01-26 13:00:00,Damaged Property,10
+1,597,2018-02-20 11:00:00,Damaged Property,22
+2,995,2018-03-26 09:00:00,Damaged Property,9
+3,1450,2018-05-02 14:00:00,Damaged Property,24
+4,1663,2018-05-20 00:00:00,Damaged Property,9
+5,1874,2018-06-06 13:00:00,Damaged Property,10
+6,1911,2018-06-09 13:00:00,Damaged Property,9
+7,2074,2018-06-22 17:00:00,Damaged Property,9
+8,2365,2018-07-17 11:00:00,Damaged Property,9
+9,2655,2018-08-08 13:00:00,Damaged Property,10
+10,2758,2018-08-17 11:00:00,Damaged Property,9
+0,770,2018-08-01 08:00:00,Encampments,55
+1,1032,2018-08-14 08:00:00,Encampments,46
+0,361,2018-05-20 00:00:00,Encampments,97
+1,549,2018-05-29 08:00:00,Encampments,45
+0,35,2018-01-02 22:00:00,Encampments,49
+1,49,2018-01-03 17:00:00,Encampments,50
+2,52,2018-01-03 20:00:00,Encampments,53
+3,76,2018-01-04 22:00:00,Encampments,52
+4,96,2018-01-05 22:00:00,Encampments,47
+5,113,2018-01-06 19:00:00,Encampments,60
+6,194,2018-01-10 21:00:00,Encampments,54
+7,216,2018-01-11 21:00:00,Encampments,52
+0,230,2018-03-10 18:00:00,Encampments,36
+1,655,2018-04-01 16:00:00,Encampments,44
+2,688,2018-04-03 08:00:00,Encampments,34
+3,728,2018-04-05 07:00:00,Encampments,43
+4,806,2018-04-09 08:00:00,Encampments,36
+5,1114,2018-04-24 08:00:00,Encampments,34
+6,1135,2018-04-25 09:00:00,Encampments,37
+7,1154,2018-04-26 08:00:00,Encampments,40
+0,428,2018-03-14 14:00:00,General Request - BUILDING INSPECTION,9
+0,1064,2018-04-04 10:00:00,General Request - PUBLIC WORKS,21
+1,1066,2018-04-04 12:00:00,General Request - PUBLIC WORKS,20
+2,1126,2018-04-09 09:00:00,General Request - PUBLIC WORKS,15
+3,1256,2018-04-18 14:00:00,General Request - PUBLIC WORKS,15
+4,1274,2018-04-19 14:00:00,General Request - PUBLIC WORKS,15
+5,1278,2018-04-19 18:00:00,General Request - PUBLIC WORKS,18
+6,1387,2018-04-26 07:00:00,General Request - PUBLIC WORKS,16
+7,1403,2018-04-27 09:00:00,General Request - PUBLIC WORKS,15
+8,1452,2018-04-30 09:00:00,General Request - PUBLIC WORKS,20
+9,1603,2018-05-09 09:00:00,General Request - PUBLIC WORKS,15
+10,1750,2018-05-18 08:00:00,General Request - PUBLIC WORKS,15
+11,1776,2018-05-20 00:00:00,General Request - PUBLIC WORKS,23
+12,2142,2018-06-13 08:00:00,General Request - PUBLIC WORKS,17
+13,2722,2018-07-21 19:00:00,General Request - PUBLIC WORKS,16
+14,3098,2018-08-15 09:00:00,General Request - PUBLIC WORKS,15
+15,3198,2018-08-21 09:00:00,General Request - PUBLIC WORKS,15
+0,31,2018-01-08 12:00:00,General Request - PUC,8
+1,364,2018-03-13 09:00:00,General Request - PUC,8
+0,533,2018-07-16 19:00:00,Graffiti,86
+1,659,2018-07-24 11:00:00,Graffiti,69
+2,1022,2018-08-15 10:00:00,Graffiti,60
+3,1023,2018-08-15 11:00:00,Graffiti,57
+0,676,2018-05-20 00:00:00,Graffiti,93
+1,716,2018-05-22 07:00:00,Graffiti,86
+0,36,2018-01-03 10:00:00,Graffiti,79
+1,203,2018-01-13 10:00:00,Graffiti,79
+2,277,2018-01-17 16:00:00,Graffiti,115
+3,354,2018-01-22 10:00:00,Graffiti,96
+4,356,2018-01-22 12:00:00,Graffiti,79
+5,357,2018-01-22 13:00:00,Graffiti,85
+6,388,2018-01-24 12:00:00,Graffiti,85
+7,437,2018-01-27 10:00:00,Graffiti,78
+8,534,2018-02-02 10:00:00,Graffiti,105
+0,829,2018-03-23 09:00:00,Graffiti,134
+1,1136,2018-04-09 10:00:00,Graffiti,91
+0,848,2018-04-25 08:00:00,Homeless Concerns,38
+1,884,2018-04-27 09:00:00,Homeless Concerns,30
+2,1018,2018-05-04 10:00:00,Homeless Concerns,32
+3,1074,2018-05-07 08:00:00,Homeless Concerns,33
+0,7,2018-01-01 11:00:00,Homeless Concerns,38
+1,11,2018-01-01 15:00:00,Homeless Concerns,28
+2,43,2018-01-03 09:00:00,Homeless Concerns,26
+3,51,2018-01-03 17:00:00,Homeless Concerns,32
+4,54,2018-01-03 20:00:00,Homeless Concerns,29
+5,72,2018-01-04 22:00:00,Homeless Concerns,29
+6,92,2018-01-05 22:00:00,Homeless Concerns,31
+7,106,2018-01-06 19:00:00,Homeless Concerns,31
+8,143,2018-01-08 22:00:00,Homeless Concerns,30
+9,162,2018-01-09 23:00:00,Homeless Concerns,26
+10,181,2018-01-10 21:00:00,Homeless Concerns,31
+11,202,2018-01-11 21:00:00,Homeless Concerns,32
+12,209,2018-01-12 10:00:00,Homeless Concerns,32
+13,335,2018-01-19 09:00:00,Homeless Concerns,30
+14,698,2018-02-07 13:00:00,Homeless Concerns,29
+15,949,2018-02-21 10:00:00,Homeless Concerns,29
+16,1182,2018-03-06 08:00:00,Homeless Concerns,26
+0,76,2018-05-20 00:00:00,Homeless Concerns,73
+1,253,2018-05-29 08:00:00,Homeless Concerns,31
+2,668,2018-06-19 09:00:00,Homeless Concerns,31
+0,13,2018-01-04 10:00:00,Illegal Postings,14
+1,59,2018-01-17 09:00:00,Illegal Postings,14
+2,70,2018-01-18 19:00:00,Illegal Postings,21
+3,76,2018-01-19 18:00:00,Illegal Postings,16
+4,97,2018-01-23 16:00:00,Illegal Postings,54
+5,100,2018-01-23 19:00:00,Illegal Postings,16
+6,104,2018-01-24 13:00:00,Illegal Postings,15
+7,111,2018-01-25 14:00:00,Illegal Postings,11
+0,377,2018-05-29 11:00:00,Illegal Postings,13
+1,534,2018-06-20 12:00:00,Illegal Postings,10
+2,711,2018-07-24 11:00:00,Illegal Postings,12
+3,865,2018-08-15 14:00:00,Illegal Postings,18
+4,887,2018-08-18 16:00:00,Illegal Postings,20
+0,1289,2018-05-04 13:00:00,Litter Receptacles,17
+1,1335,2018-05-08 14:00:00,Litter Receptacles,12
+2,1359,2018-05-10 11:00:00,Litter Receptacles,16
+3,1459,2018-05-20 00:00:00,Litter Receptacles,12
+4,1929,2018-06-30 13:00:00,Litter Receptacles,16
+5,2177,2018-07-23 13:00:00,Litter Receptacles,13
+6,2192,2018-07-24 15:00:00,Litter Receptacles,16
+7,2325,2018-08-04 12:00:00,Litter Receptacles,12
+8,2497,2018-08-19 13:00:00,Litter Receptacles,13
+9,2554,2018-08-24 09:00:00,Litter Receptacles,14
+0,960,2018-02-27 09:00:00,MUNI Feedback,13
+0,1059,2018-08-22 08:00:00,MUNI Feedback,18
+0,1004,2018-04-27 09:00:00,MUNI Feedback,15
+0,307,2018-01-31 23:00:00,Noise Report,11
+1,1929,2018-07-04 21:00:00,Noise Report,14
+2,1930,2018-07-04 22:00:00,Noise Report,11
+0,310,2018-06-22 17:00:00,Parking Enforcement,26
+1,406,2018-06-27 09:00:00,Parking Enforcement,29
+2,407,2018-06-27 10:00:00,Parking Enforcement,25
+3,688,2018-07-10 17:00:00,Parking Enforcement,27
+4,862,2018-07-18 18:00:00,Parking Enforcement,31
+5,863,2018-07-18 19:00:00,Parking Enforcement,24
+6,920,2018-07-21 12:00:00,Parking Enforcement,25
+7,1163,2018-08-01 17:00:00,Parking Enforcement,22
+8,1299,2018-08-08 08:00:00,Parking Enforcement,26
+0,55,2018-03-29 09:00:00,Parking Enforcement,12
+1,114,2018-04-10 17:00:00,Parking Enforcement,10
+2,115,2018-04-10 18:00:00,Parking Enforcement,8
+0,720,2018-05-09 20:00:00,Parking Enforcement,33
+1,936,2018-05-20 00:00:00,Parking Enforcement,58
+0,356,2018-04-22 15:00:00,Parking Enforcement,32
+1,413,2018-04-25 12:00:00,Parking Enforcement,46
+2,480,2018-04-28 13:00:00,Parking Enforcement,33
+0,138,2018-04-14 09:00:00,Parking Enforcement,14
+1,246,2018-04-19 18:00:00,Parking Enforcement,20
+0,183,2018-01-21 14:00:00,Rec and Park Requests,11
+1,200,2018-01-23 10:00:00,Rec and Park Requests,11
+2,253,2018-01-28 10:00:00,Rec and Park Requests,10
+3,327,2018-02-05 08:00:00,Rec and Park Requests,14
+4,725,2018-03-18 10:00:00,Rec and Park Requests,10
+5,806,2018-03-26 11:00:00,Rec and Park Requests,11
+6,808,2018-03-26 13:00:00,Rec and Park Requests,13
+7,1104,2018-04-22 10:00:00,Rec and Park Requests,11
+8,1187,2018-04-29 17:00:00,Rec and Park Requests,15
+9,1429,2018-05-20 00:00:00,Rec and Park Requests,24
+10,1690,2018-06-10 09:00:00,Rec and Park Requests,20
+11,1700,2018-06-11 08:00:00,Rec and Park Requests,12
+12,1875,2018-06-24 19:00:00,Rec and Park Requests,10
+13,1939,2018-06-29 18:00:00,Rec and Park Requests,11
+14,1954,2018-07-01 09:00:00,Rec and Park Requests,14
+15,2114,2018-07-15 09:00:00,Rec and Park Requests,17
+0,460,2018-04-19 22:00:00,Residential Building Request,14
+0,84,2018-01-08 08:00:00,Sewer Issues,13
+1,86,2018-01-08 10:00:00,Sewer Issues,24
+2,87,2018-01-08 11:00:00,Sewer Issues,19
+3,88,2018-01-08 12:00:00,Sewer Issues,16
+4,89,2018-01-08 13:00:00,Sewer Issues,21
+5,90,2018-01-08 14:00:00,Sewer Issues,16
+6,91,2018-01-08 15:00:00,Sewer Issues,11
+7,708,2018-03-01 09:00:00,Sewer Issues,13
+8,709,2018-03-01 10:00:00,Sewer Issues,51
+9,710,2018-03-01 11:00:00,Sewer Issues,20
+10,713,2018-03-01 14:00:00,Sewer Issues,13
+0,122,2018-04-06 08:00:00,Sewer Issues,15
+1,131,2018-04-06 18:00:00,Sewer Issues,15
+2,132,2018-04-06 19:00:00,Sewer Issues,11
+0,43,2018-01-07 12:00:00,Sidewalk or Curb,11
+1,137,2018-01-22 10:00:00,Sidewalk or Curb,16
+2,765,2018-04-03 14:00:00,Sidewalk or Curb,16
+3,817,2018-04-09 19:00:00,Sidewalk or Curb,10
+4,847,2018-04-12 14:00:00,Sidewalk or Curb,20
+5,848,2018-04-12 15:00:00,Sidewalk or Curb,16
+6,911,2018-04-18 15:00:00,Sidewalk or Curb,16
+7,966,2018-04-23 14:00:00,Sidewalk or Curb,13
+8,1228,2018-05-20 00:00:00,Sidewalk or Curb,20
+9,1368,2018-06-03 10:00:00,Sidewalk or Curb,10
+10,1607,2018-06-27 23:00:00,Sidewalk or Curb,11
+11,1679,2018-07-06 14:00:00,Sidewalk or Curb,15
+0,160,2018-01-17 09:00:00,Sign Repair,9
+1,230,2018-01-23 16:00:00,Sign Repair,10
+2,338,2018-02-01 17:00:00,Sign Repair,10
+3,477,2018-02-13 13:00:00,Sign Repair,10
+4,811,2018-03-15 07:00:00,Sign Repair,11
+5,842,2018-03-17 16:00:00,Sign Repair,12
+6,868,2018-03-19 16:00:00,Sign Repair,9
+7,878,2018-03-20 15:00:00,Sign Repair,10
+8,929,2018-03-24 19:00:00,Sign Repair,18
+9,1584,2018-05-20 00:00:00,Sign Repair,12
+10,1642,2018-05-25 14:00:00,Sign Repair,9
+11,2340,2018-07-27 10:00:00,Sign Repair,13
+12,2353,2018-07-28 12:00:00,Sign Repair,11
+13,2432,2018-08-04 15:00:00,Sign Repair,9
+0,627,2018-01-29 09:00:00,Street and Sidewalk Cleaning,105
+0,433,2018-05-20,Street and Sidewalk Cleaning,201
+0,244,2018-07-02 09:00:00,Street and Sidewalk Cleaning,132
+0,1308,2018-04-30 08:00:00,Street and Sidewalk Cleaning,99
+1,1309,2018-04-30 09:00:00,Street and Sidewalk Cleaning,77
+2,1310,2018-04-30 10:00:00,Street and Sidewalk Cleaning,70
+0,377,2018-02-02 09:00:00,Street Defects,9
+1,547,2018-02-17 17:00:00,Street Defects,9
+2,850,2018-03-14 12:00:00,Street Defects,12
+3,854,2018-03-14 17:00:00,Street Defects,9
+4,881,2018-03-16 13:00:00,Street Defects,9
+5,907,2018-03-18 10:00:00,Street Defects,9
+6,1284,2018-04-12 15:00:00,Street Defects,9
+7,1468,2018-04-24 08:00:00,Street Defects,11
+8,1506,2018-04-26 14:00:00,Street Defects,12
+9,2231,2018-06-21 22:00:00,Street Defects,18
+10,2307,2018-06-28 07:00:00,Street Defects,11
+11,2473,2018-07-11 13:00:00,Street Defects,9
+12,2567,2018-07-18 17:00:00,Street Defects,10
+0,32,2018-01-03 15:00:00,Streetlights,14
+1,176,2018-01-14 18:00:00,Streetlights,15
+2,178,2018-01-14 20:00:00,Streetlights,10
+3,203,2018-01-16 17:00:00,Streetlights,9
+4,695,2018-02-23 12:00:00,Streetlights,9
+5,743,2018-02-27 19:00:00,Streetlights,9
+6,744,2018-02-27 20:00:00,Streetlights,16
+7,876,2018-03-10 20:00:00,Streetlights,13
+8,962,2018-03-19 20:00:00,Streetlights,33
+9,963,2018-03-19 21:00:00,Streetlights,20
+10,1323,2018-04-18 21:00:00,Streetlights,14
+11,1643,2018-05-16 20:00:00,Streetlights,9
+12,1644,2018-05-16 21:00:00,Streetlights,15
+13,2037,2018-06-28 13:00:00,Streetlights,9
+14,2147,2018-07-10 21:00:00,Streetlights,11
+15,2369,2018-07-31 09:00:00,Streetlights,17
+16,2500,2018-08-14 21:00:00,Streetlights,17
+0,556,2018-05-07 16:00:00,Temporary Sign Request,19
+0,61,2018-01-09 14:00:00,Temporary Sign Request,11
+1,64,2018-01-09 17:00:00,Temporary Sign Request,26
+2,136,2018-01-18 14:00:00,Temporary Sign Request,12
+3,138,2018-01-18 16:00:00,Temporary Sign Request,18
+4,139,2018-01-18 17:00:00,Temporary Sign Request,28
+5,150,2018-01-19 15:00:00,Temporary Sign Request,21
+0,625,2018-03-16 09:00:00,Temporary Sign Request,21
+1,626,2018-03-16 10:00:00,Temporary Sign Request,37
+2,627,2018-03-16 11:00:00,Temporary Sign Request,21
+3,735,2018-03-27 13:00:00,Temporary Sign Request,29
+4,736,2018-03-27 14:00:00,Temporary Sign Request,26
+0,713,2018-03-08 12:00:00,Tree Maintenance,11
+1,888,2018-03-23 09:00:00,Tree Maintenance,11
+2,1071,2018-04-08 11:00:00,Tree Maintenance,10
+3,1081,2018-04-09 09:00:00,Tree Maintenance,10
+4,1205,2018-04-18 14:00:00,Tree Maintenance,10
+5,1242,2018-04-21 12:00:00,Tree Maintenance,10
+6,1353,2018-04-30 14:00:00,Tree Maintenance,10
+7,1403,2018-05-04 09:00:00,Tree Maintenance,19
+8,1404,2018-05-04 10:00:00,Tree Maintenance,11
+9,1465,2018-05-10 10:00:00,Tree Maintenance,10
+10,1525,2018-05-14 18:00:00,Tree Maintenance,10
+11,1543,2018-05-16 08:00:00,Tree Maintenance,10
+12,1548,2018-05-16 13:00:00,Tree Maintenance,11
+13,1572,2018-05-18 08:00:00,Tree Maintenance,10
+14,1597,2018-05-20 00:00:00,Tree Maintenance,19
+15,1599,2018-05-20 09:00:00,Tree Maintenance,10
+16,1602,2018-05-20 13:00:00,Tree Maintenance,15
+17,2344,2018-07-16 09:00:00,Tree Maintenance,11
+18,2439,2018-07-23 13:00:00,Tree Maintenance,10
+19,2449,2018-07-24 10:00:00,Tree Maintenance,10
+20,2814,2018-08-22 14:00:00,Tree Maintenance,10

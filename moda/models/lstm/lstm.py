@@ -1,19 +1,16 @@
 ## Notice: this is still WIP and not working as a part of the moda framework
 
 # import comet_ml in the top of your file
-from comet_ml import Experiment
+import time
+
 from keras import Sequential
 from keras.callbacks import EarlyStopping
 from keras.layers import LSTM, Dense, Activation
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
-from moda.example.example import prep_data
 from moda.models.trend_detector import AbstractTrendDetector
-
-experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrMbFobYDZRRA4tvoYiR",
-                        project_name="keras-lstm-sf311-forecast", workspace="omri374")
-
 import pandas as pd
+import numpy as np
 
 
 
@@ -47,7 +44,7 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
     """
 
-    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None,window_size = 24,
+    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None,window_size = 24,batch_size = 256, epochs = 10,
                  resample=True, min_periods=10, lookback='30D'):
         super(LSTMTrendinessDetector, self).__init__(freq, is_multicategory, resample)
         self.lookback = lookback
@@ -55,6 +52,9 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         self.min_value = min_value
         self.min_periods = min_periods
         self.window_size = window_size
+        self.batch_size = batch_size
+        self.epochs = epochs
+        self.model = {}
 
     def lstm_forecast_model(self, window_size,verbose=False):
         model = Sequential()
@@ -70,29 +70,46 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
 
         return model
 
-    def fit_one_category(self,dataset,verbose=False):
-        one_category_scaled = scale(dataset)
+    def fit_one_category(self, dataset, category=None, verbose=False):
+        train = scale(dataset)
 
-        datetimeindex = one_category_scaled.index
-        num_dates = len(datetimeindex)
-
-        train = one_category_scaled.loc[datetimeindex[:int(num_dates * train_percent / 100)]]
-        test = one_category_scaled.loc[datetimeindex[int(num_dates * train_percent / 100):]]
-
-        as_windows_train = get_windowed_ts(train, window_size=window_size)
-        as_windows_test = get_windowed_ts(test, window_size=window_size)
+        as_windows_train = get_windowed_ts(train, window_size=self.window_size)
         train_X, train_y = split_history_and_current(as_windows_train)
-        test_X, test_y = split_history_and_current(as_windows_test)
 
         train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
-        test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
 
-        model = self.lstm_forecast_model(window_size=window_size,verbose=verbose)
+        # Get model definition
+        model = self.lstm_forecast_model(window_size=self.window_size,verbose=verbose)
 
+
+        # Fit model
         start = time.time()
-        model.fit(train_X, train_y, batch_size=256, epochs=10, validation_split=0.1,
+        model.fit(train_X, train_y, batch_size=self.batch_size, epochs=self.epochs, validation_split=0.1,
                   callbacks=[EarlyStopping(patience=2)])
         print("> Compilation Time : ", time.time() - start)
+
+        self.model[category] = model
+
+    def predict_one_category(self, X, category):
+        test = scale(X)
+
+        as_windows_test = get_windowed_ts(test, window_size=self.window_size)
+        test_X, test_y = split_history_and_current(as_windows_test)
+
+        test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
+
+        preds = self.model[category].predict(test_X)
+
+        from sklearn.metrics import mean_squared_error
+
+        actual = test_y
+        prediction = preds
+        mse = mean_squared_error(actual, prediction)
+        print("MSE=" + str(mse))
+        results = pd.DataFrame({"date": X.index, "prediction": preds.squeeze(), "actual": test_y, "diff": test_y - preds.squeeze()})
+        results['diff_rolling_std'] = results['diff'].rolling(self.lookback, min_periods=self.min_periods).std()  # naive version where we look at the standard deviation of the difference between predicted and actual in a previous window.
+        results['prediction'] = np.where(results['diff'] > self.num_of_std * results['diff_rolling_std'], 1, 0)
+        return results
 
 
 def scale(X):
@@ -105,54 +122,3 @@ def scale(X):
     scaled['value'] = scaled_values
 
     return scaled
-
-
-
-
-if __name__ == '__main__':
-    datapath = "moda/example/SF311_simplified.csv"
-    category = "Streen and Sidewalk Cleaning"
-    train_percent = 70
-    window_size = 100
-    start_date = "01-01-2017"
-    end_date = "01-01-2018"
-
-    df = prep_data(datapath, max_date=end_date, min_date=start_date)
-
-    one_category = df.loc[pd.IndexSlice[:, category], :]. \
-        reset_index(level='category', drop=True)
-    one_category_scaled = scale(one_category)
-
-    datetimeindex = one_category_scaled.index
-    num_dates = len(datetimeindex)
-
-    train = one_category_scaled.loc[datetimeindex[:int(num_dates * train_percent / 100)]]
-    test = one_category_scaled.loc[datetimeindex[int(num_dates * train_percent / 100):]]
-
-    print("Training set length = {0}, Test set length = {1}".format(len(train), len(test)))
-
-    as_windows_train = get_windowed_ts(train, window_size=window_size)
-    as_windows_test = get_windowed_ts(test, window_size=window_size)
-    train_X, train_y = split_history_and_current(as_windows_train)
-    test_X, test_y = split_history_and_current(as_windows_test)
-
-    train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
-    test_X = test_X.reshape(test_X.shape[0], test_X.shape[1], 1)
-    model = lstm_forecast_model(window_size=window_size)
-
-    import time
-
-    start = time.time()
-    model.fit(train_X, train_y, batch_size=128, epochs=9, validation_split=0.1)
-    print("> Compilation Time : ", time.time() - start)
-
-    # Doing a prediction on all the test data at once
-    preds = model.predict(test_X)
-
-    from sklearn.metrics import mean_squared_error
-
-    actual = test_y
-    prediction = preds
-    mse = mean_squared_error(actual, prediction)
-    print("MSE=" + str(mse))
-    experiment.log_metric("mse", str(mse))

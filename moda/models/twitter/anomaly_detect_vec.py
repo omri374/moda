@@ -3,7 +3,7 @@ import scipy as sp
 import pandas as pd
 import datetime
 import statsmodels.api as sm
-import anomaly_detection.anomaly_detect_ts
+from moda.models.twitter import anomaly_detect_ts
 
 '''
 Description:
@@ -191,4 +191,4 @@ def anomaly_detect_vec(x, max_anoms=0.1, direction="pos", alpha=0.05,
 
     all_anoms.drop_duplicates(inplace=True)
     seasonal_plus_trend.drop_duplicates(inplace=True)
-    
+
