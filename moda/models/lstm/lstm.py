@@ -3,16 +3,11 @@
 # import comet_ml in the top of your file
 import time
 
-from keras import Sequential
-from keras.callbacks import EarlyStopping
-from keras.layers import LSTM, Dense, Activation
+import numpy as np
+import pandas as pd
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.models.trend_detector import AbstractTrendDetector
-import pandas as pd
-import numpy as np
-
-
 
 
 class LSTMTrendinessDetector(AbstractTrendDetector):
@@ -44,7 +39,8 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
     """
 
-    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None,window_size = 24,batch_size = 256, epochs = 10,
+    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None, window_size=24, batch_size=256,
+                 epochs=10,
                  resample=True, min_periods=10, lookback='30D'):
         super(LSTMTrendinessDetector, self).__init__(freq, is_multicategory, resample)
         self.lookback = lookback
@@ -56,21 +52,23 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         self.epochs = epochs
         self.model = {}
 
-    def lstm_forecast_model(self, window_size,verbose=False):
+    def lstm_forecast_model(self, window_size, verbose=False):
+        from keras import Sequential
+        from keras.layers import LSTM, Dense, Activation, Dropout
+
         model = Sequential()
-        # model.add(Conv1D(input_shape=(window_size, 1), filters=32, kernel_size=10))
-        # model.add(MaxPooling1D(pool_size=5))
-        model.add(LSTM(input_shape=(window_size, 1), output_dim=window_size, return_sequences=True))
-        model.add(LSTM(128, return_sequences=False))
+        model.add(LSTM(input_shape=(window_size, 1), units=window_size, return_sequences=True))
+        model.add(Dropout(0.5))
+        model.add(LSTM(128))
         model.add(Dense(1))
         model.add(Activation("linear"))
         model.compile(loss="mse", optimizer="adam")
-        if verbose:
-            print(model.summary())
+        print(model.summary())
 
         return model
 
     def fit_one_category(self, dataset, category=None, verbose=False):
+        from keras.callbacks import EarlyStopping
         train = scale(dataset)
 
         as_windows_train = get_windowed_ts(train, window_size=self.window_size)
@@ -79,8 +77,7 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         train_X = train_X.reshape(train_X.shape[0], train_X.shape[1], 1)
 
         # Get model definition
-        model = self.lstm_forecast_model(window_size=self.window_size,verbose=verbose)
-
+        model = self.lstm_forecast_model(window_size=self.window_size, verbose=verbose)
 
         # Fit model
         start = time.time()
@@ -106,8 +103,10 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         prediction = preds
         mse = mean_squared_error(actual, prediction)
         print("MSE=" + str(mse))
-        results = pd.DataFrame({"date": X.index, "prediction": preds.squeeze(), "actual": test_y, "diff": test_y - preds.squeeze()})
-        results['diff_rolling_std'] = results['diff'].rolling(self.lookback, min_periods=self.min_periods).std()  # naive version where we look at the standard deviation of the difference between predicted and actual in a previous window.
+        results = pd.DataFrame(
+            {"date": X.index, "prediction": preds.squeeze(), "actual": test_y, "diff": test_y - preds.squeeze()})
+        results['diff_rolling_std'] = results['diff'].rolling(self.lookback,
+                                                              min_periods=self.min_periods).std()  # naive version where we look at the standard deviation of the difference between predicted and actual in a previous window.
         results['prediction'] = np.where(results['diff'] > self.num_of_std * results['diff_rolling_std'], 1, 0)
         return results
 

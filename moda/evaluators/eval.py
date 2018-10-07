@@ -1,10 +1,7 @@
-import math
-
 import numpy as np
 import pandas as pd
-from sklearn.model_selection import TimeSeriesSplit
 
-from moda.evaluators.metrics.metrics import _initialize_metrics, get_final_metrics, get_metrics_with_shift
+from moda.evaluators.metrics.metrics import _initialize_metrics, get_all_metrics, get_metrics_with_shift
 
 
 def eval_models(X, y, models, label_col_name='label', prediction_col_name='prediction', value_col_name='value',
@@ -76,7 +73,7 @@ def eval_models(X, y, models, label_col_name='label', prediction_col_name='predi
 
             counter += 1
 
-        final_metrics = get_final_metrics(metrics)
+        final_metrics = get_all_metrics(metrics)
         if verbose:
             print(final_metrics)
         per_model_res[str(model.__name__)] = final_metrics
@@ -159,7 +156,7 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
 
                 counter += 1
 
-        final_metrics = get_final_metrics(metrics)
+        final_metrics = get_all_metrics(metrics)
         if verbose:
             print(final_metrics)
         per_model_res[str(model.__name__)] = final_metrics
@@ -170,8 +167,6 @@ def _prep_set(X, dates):
     new_samples = X.copy().loc[dates]
     new_samples.index = new_samples.index.remove_unused_levels()
     return new_samples
-
-
 
 
 def get_evaluation_metrics(test_values_df, prediction_df, labels_df, metrics=None, value_col_name='value',
@@ -237,10 +232,8 @@ def get_metrics_for_one_category(dataset, label_col_name, prediction_col_name, v
 
 
 def _join_pred_to_dataset(original_df, prediction_df, test_values_df, label_col_name, value_col_name):
-    results = pd.merge(prediction_df, original_df, how='left', on=['date', 'category'])[['prediction',label_col_name]]
+    results = pd.merge(prediction_df, original_df, how='left', on=['date', 'category'])[['prediction', label_col_name]]
     results = pd.merge(results, test_values_df, how='left', on=['date', 'category'])
     results[label_col_name] = results[label_col_name].fillna(0)
     results.sort_index(level=['date', 'category'], ascending=True, inplace=True)
     return results
-
-

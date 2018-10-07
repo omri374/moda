@@ -88,12 +88,11 @@ class AbstractTrendDetector(ABC):
             print("categories found = {}".format(categories))
         category_count = 0
         for category in categories:
-            print(category)
             one_category = self.get_one_category_df(X, category)
 
             res = self.predict_one_category(one_category, category)
             res['category'] = category
-            output = pd.concat([output, res])
+            output = pd.concat([output, res],sort=True)
 
         if self.is_multicategory:
             output = output.reset_index().set_index(['date', 'category'])
