@@ -15,6 +15,7 @@ def test_ts_to_range():
     range = ts_to_range(ts, time_range='24H')
     assert 'category' in range.index.names
     assert 'date' in range.index.names
+    assert range.iloc[0,0] > 1
 
 
 def test_ts_to_range_no_categories():
@@ -26,6 +27,7 @@ def test_ts_to_range_no_categories():
     range = ts_to_range(ts2, time_range='24H')
     assert 'category' not in range.index.names
     assert 'date' in range.index.names
+    assert range.iloc[0,0] > 1
 
 
 if __name__ == '__main__':

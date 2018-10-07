@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_metrics_with_shift(predicted, actual, category="", metrics=None, window_size=5):
     """
     Calculates TP, FP, and FN while allowing shifts. For example, predicted = [0,1,0], actual [1,0,0] and a window_size of 1 would return a TP.
@@ -18,9 +19,6 @@ def get_metrics_with_shift(predicted, actual, category="", metrics=None, window_
     if metrics.get(category) is None:
         metrics[category] = _initialize_metrics_one_category()
     n = len(predicted)
-
-
-
 
     # Iterate over all labels, and look for corresponding predictions in the window.
     prev = -1
@@ -56,6 +54,7 @@ def get_metrics_with_shift(predicted, actual, category="", metrics=None, window_
             prev = pred
     return metrics
 
+
 def _initialize_metrics_one_category():
     """
     Initialize the metrics dictionary for one category
@@ -77,7 +76,7 @@ def _initialize_metrics(categories):
     return metrics
 
 
-def get_final_metrics(metrics):
+def get_all_metrics(metrics):
     """
     Aggregates metrics across all categories.
     :param metrics: A dictionary of TP,FP,TN and FN values for each category
@@ -106,6 +105,14 @@ def get_final_metrics(metrics):
     final_metrics['f0.5'] = f_beta(final_metrics['precision'], final_metrics['recall'], 0.5)
     final_metrics['raw'] = metrics
     return final_metrics
+
+
+def get_final_metrics(metrics):
+    if metrics is None:
+        return None
+
+    final_metrics = ['f1', 'recall', 'precision', 'f0.5']  # The keys you want
+    return dict((k, metrics[k]) for k in final_metrics if k in metrics)
 
 
 def f_beta(precision, recall, beta):

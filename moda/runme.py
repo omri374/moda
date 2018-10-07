@@ -2,10 +2,10 @@ import json
 import os
 
 import numpy as np
-import pandas as pd
 from comet_ml import Experiment
+from moda.evaluators.metrics.metrics import get_final_metrics
 
-from moda.evaluators.eval import get_evaluation_metrics, get_final_metrics, eval_models
+from moda.evaluators.eval import get_evaluation_metrics, get_all_metrics, eval_models
 from moda.models.azure_anomaly_detection.azure_ad import AzureAnomalyTrendinessDetector
 from moda.models.data_reader import read_data
 from moda.models.ma_seasonal.ma_seasonal_model import MovingAverageSeasonalTrendinessDetector
@@ -20,7 +20,6 @@ def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl'
 
     if len(dataset.index.levels) > 1:
         categories = dataset.index.levels[1]
-        print("categories found = {}".format(categories))
 
     if model_name == 'twitter':
         model = TwitterAnomalyTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value, threshold=None,
@@ -46,8 +45,8 @@ def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl'
     prediction = model.predict(dataset, verbose=True)
     raw_metrics = get_evaluation_metrics(dataset[['value']], prediction[['prediction']], dataset[['label']],
                                          window_size_for_metrics=5)
-    metrics = get_final_metrics(raw_metrics)
-    print(metrics)
+    metrics = get_all_metrics(raw_metrics)
+    print(get_final_metrics(metrics))
 
     ## Plot each category
     if plot:
@@ -188,7 +187,7 @@ def eval_model(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', us
         prediction = model.tune_prediction(prediction, sens)
         raw_metrics = get_evaluation_metrics(X[['value']], prediction[['prediction']], y[['label']],
                                              window_size_for_metrics=5)
-        metrics = get_final_metrics(raw_metrics)
+        metrics = get_all_metrics(raw_metrics)
         result = {}
         result[model.__name__] = metrics
         print('sens = ' + str(sens) +
@@ -226,41 +225,43 @@ def log_experiment(datapath, dataset, model, parameters, metrics):
 
 if __name__ == '__main__':
 
-    log_experiment("datapath", pd.DataFrame({"a": [1, 2, 3]}), STLTrendinessDetector("24H"), {"threshold": np.NaN},
-                   {"f1": np.NaN, "f0.5": np.NaN})
-
-    inp1 = ''
-    while inp1 not in ['r', 'e']:
-        inp1 = input("Run (r) or evaluate (e)?")
-
-    city = 0
-    while city not in ['1', '2', '3', '9']:
-        city = input("Select city: Corona (1), Pompano (2), SF (3), all (9):")
-
-    freq = 0
-    while freq not in ['1', '2', '3','4']:
-        freq = input("Select time frequency: 30min (1), 1H (2), 12H (3) or 24H (4)")
-
-
-    freqs = {'1': '30min', '2': '1H', '3': '12H','4':'24H'}
+    freqs = {'1': '30min', '2': '1H', '3': '12H', '4': '24H'}
     cities = {'1': 'Corona', '2': 'Pompano', '3': 'SF'}
     models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure'}
 
-    if cities != 9:
-        datapath = "datasets/{0}{1}_labeled.csv".format(cities[city],freqs[freq])
-
-
-    if inp1 == 'r':
+    datapath = input("Enter file name or press enter for predefined datasets: ")
+    if len(datapath) != 0:
+        freq = input("Enter time series frequency (e.g. 24H, 30min)")
         model = input("Select model: Moving Averages (m), STL (s), Twitter (t), Azure Anomaly Detector (a):")
-        prediction = run_model(datapath=datapath, freq=freqs[city], model_name=models[model])
-        prediction.to_csv(cities[city] + '-' + models[model] + '-prediction.csv')
-    if inp1 == 'e':
-        if city == '9':
-            print("Evaluating all cities")
-            # eval_model(datapath="../tests/dummy3.txt", freq='12H',use_comet=False)
-            for city, freq in zip(cities, freqs):
-                datapath = "datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
-                eval_model(datapath=datapath, freq=freqs[freq], use_comet=True)
-        else:
-            print("Loading file {0}. Evaluating all models".format(datapath))
-            eval_model(datapath=datapath, freq=freqs[freq])
+        prediction = run_model(datapath=datapath, freq=freq, model_name=models[model])
+    else:
+
+        inp1 = ''
+        while inp1 not in ['r', 'e']:
+            inp1 = input("Run (r) or evaluate (e)?")
+
+        city = 0
+        while city not in ['1', '2', '3', '9']:
+            city = input("Select city: Corona (1), Pompano (2), SF (3), all (9):")
+
+        freq = 0
+        while freq not in ['1', '2', '3', '4']:
+            freq = input("Select time frequency: 30min (1), 1H (2), 12H (3) or 24H (4)")
+
+        if cities != 9:
+            datapath = "datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
+
+        if inp1 == 'r':
+            model = input("Select model: Moving Averages (m), STL (s), Twitter (t), Azure Anomaly Detector (a):")
+            prediction = run_model(datapath=datapath, freq=freqs[city], model_name=models[model])
+            prediction.to_csv(cities[city] + '-' + models[model] + '-prediction.csv')
+        if inp1 == 'e':
+            if city == '9':
+                print("Evaluating all cities")
+                # eval_model(datapath="../tests/dummy3.txt", freq='12H',use_comet=False)
+                for city, freq in zip(cities, freqs):
+                    datapath = "datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
+                    eval_model(datapath=datapath, freq=freqs[freq], use_comet=True)
+            else:
+                print("Loading file {0}. Evaluating all models".format(datapath))
+                eval_model(datapath=datapath, freq=freqs[freq])

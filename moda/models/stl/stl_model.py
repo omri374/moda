@@ -95,7 +95,6 @@ class STLTrendinessDetector(AbstractTrendDetector):
         try:
             diff = np.median(np.diff(ts.index))
             diff_in_days = float((np.int64(diff) / self.HOURS_IN_NANOSECONDS) / 24)
-            print("Adjusted seasonality = " + str(float(self.seasonality) / diff_in_days))
 
             decomposition = decompose(ts.values, period=int(self.seasonality / diff_in_days), lo_frac=self.lo_frac,
                                       lo_delta=self.lo_delta)
@@ -176,6 +175,7 @@ class STLTrendinessDetector(AbstractTrendDetector):
     def plot_one_category(self, category=None, labels=None):
         import matplotlib.pyplot as plt
 
+        print("Plotting STL results for category " + category)
         if self.input_data is None:
             print("Empty datasets")
             return None
@@ -185,7 +185,12 @@ class STLTrendinessDetector(AbstractTrendDetector):
             return None
 
         if category not in self.input_data.keys():
-            print("Empty datasets")
+            print("Empty dataset")
+            return None
+
+        if len(self.input_data[category]) < 5:
+            print("Not enough samples for plotting")
+            return None
 
         def ts_subplot(plt, series, label):
             plt.plot(series, label=label, linewidth=0.5)
