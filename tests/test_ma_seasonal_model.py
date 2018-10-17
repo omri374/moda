@@ -2,7 +2,7 @@
 import os
 
 import pandas as pd
-from moda.models.data_reader import read_data
+from moda.dataprep.data_reader import read_data
 from moda.models.ma_seasonal import MovingAverageSeasonalTrendinessDetector
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

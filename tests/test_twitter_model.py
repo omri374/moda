@@ -4,8 +4,7 @@ import os
 import pandas as pd
 from moda.models.twitter import TwitterAnomalyTrendinessDetector
 
-from moda.models.data_reader import read_data
-from moda.models.stl.stl_model import STLTrendinessDetector
+from moda.dataprep.data_reader import read_data
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

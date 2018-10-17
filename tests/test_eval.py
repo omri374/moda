@@ -6,7 +6,7 @@ import pandas as pd
 import pytest
 
 from moda.evaluators.eval import eval_models, eval_models_CV
-from moda.models.data_reader import read_data
+from moda.dataprep.data_reader import read_data
 from moda.models.ma_seasonal import MovingAverageSeasonalTrendinessDetector
 from tests.mock_model import MockModel
 

@@ -19,3 +19,6 @@ def test_create_windowed_df():
     assert windowed_df.iloc[1, 0] == 1
     assert windowed_df.iloc[1, 1] == 2
     assert windowed_df.iloc[1, 2] == 3
+
+if __name__ == '__main__':
+    test_create_windowed_df()

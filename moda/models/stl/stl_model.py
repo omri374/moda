@@ -202,6 +202,10 @@ class STLTrendinessDetector(AbstractTrendDetector):
         else:
             category_dataset = self.input_data
 
+        if len(category_dataset < 10):
+            print("Not enough samples to plot.")
+            return
+
         plt.subplot(421, )
         ts_subplot(plt, category_dataset['value'], label='Original')
         plt.subplot(422)

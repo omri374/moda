@@ -14,12 +14,9 @@ def ts_to_range(ts, time_range='1H'):
         return
 
     if 'category' in ts:
-        ts = ts.loc[:,['date','category']] # Keep only first two columns
-        range_grp = ts.groupby([pd.Grouper(freq=time_range), 'category']).agg('count')
-        range_grp.columns.values[0] = 'value'
-        range_grp = range_grp[['value']]
+        range_grp = ts.groupby([pd.Grouper(freq=time_range),'category']).size().to_frame('value')
         range_grp.index.names = ['date', 'category']
     else:
-        range_grp = ts.groupby(pd.Grouper(freq=time_range)).agg('count')
+        range_grp = ts.groupby(pd.Grouper(freq=time_range)).size().to_frame('value')
 
     return range_grp
