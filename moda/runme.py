@@ -1,10 +1,8 @@
 import json
 import os
 
-from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
-
+from moda.evaluators import get_metrics_for_all_categories, get_final_metrics, evaluate_all_models
 from moda.dataprep import read_data
-from moda.evaluators import eval_all_models
 from moda.models import TwitterAnomalyTrendinessDetector, MovingAverageSeasonalTrendinessDetector, \
     STLTrendinessDetector, AzureAnomalyTrendinessDetector
 
@@ -39,7 +37,7 @@ def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl'
     prediction = model.predict(dataset, verbose=True)
     raw_metrics = get_metrics_for_all_categories(dataset[['value']], prediction[['prediction']], dataset[['label']],
                                                  window_size_for_metrics=5)
-    metrics = get_final_metrics(raw_metrics, summarized=True)
+    metrics = get_final_metrics(raw_metrics, summarized=False)
     print(metrics)
 
     ## Plot each category
@@ -90,4 +88,4 @@ if __name__ == '__main__':
         prediction = run_model(datapath=datapath, freq=freqs[city], model_name=models[model])
     if inp1 == 'e':
         print("Loading file {0}. Evaluating all models".format(datapath))
-        eval_all_models(datapath=datapath, freq=freqs[freq])
+        evaluate_all_models(datapath=datapath, freq=freqs[freq])

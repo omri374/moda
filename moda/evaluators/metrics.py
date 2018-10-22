@@ -176,11 +176,11 @@ def _join_raw_metrics(raw1, raw2):
     return raw
 
 
-def get_final_metrics(raw_metrics, summarized=True):
+def get_final_metrics(raw_metrics, summarized=False):
     """
     Calculates final metrics from all categories.
     :param summarized: True if the result should contain only final metrics (precision recall, f1 and f0.5)
-    False if the result should contain all the per category values too.
+    False if the result should contain all the per category metrics too.
     :param raw_metrics: A dictionary of tp, fp and fn values for each category
     :return: a dictionary with the precision, recall, f1 and f0.5 metrics, as well as the input metrics data.
     """
@@ -188,12 +188,35 @@ def get_final_metrics(raw_metrics, summarized=True):
     tp = 0
     fp = 0
     fn = 0
-    for category in raw_metrics:
-        tp += np.sum(raw_metrics[category]['TP'])
-        fp += np.sum(raw_metrics[category]['FP'])
-        fn += np.sum(raw_metrics[category]['FN'])
-
+    num_values = 0
+    num_samples = 0
     final_metrics = dict()
+
+
+    for category in raw_metrics:
+        category_tp = raw_metrics[category]['TP']
+        category_fp = raw_metrics[category]['FP']
+        category_fn = raw_metrics[category]['FN']
+
+        final_metrics[category] = {}
+
+        if category_tp > 0:
+            final_metrics[category]['precision'] = category_tp / (category_tp + category_fp)
+            final_metrics[category]['recall'] = category_tp / (category_tp + category_fn)
+            final_metrics[category]['f1'] = f_beta(final_metrics[category]['precision'],
+                                                     final_metrics[category]['recall'], 1
+                                                     )
+        if 'num_values' in raw_metrics[category]:
+            final_metrics[category]['num_values'] = raw_metrics[category]['num_values']
+        if 'num_samples' in raw_metrics[category]:
+            final_metrics[category]['num_samples'] = raw_metrics[category]['num_samples']
+
+        tp += category_tp
+        fp += category_fp
+        fn += category_fn
+        num_values += final_metrics[category]['num_values']
+        num_samples += final_metrics[category]['num_samples']
+
     if (tp + fp) > 0:
         final_metrics['precision'] = tp / (tp + fp)
     else:
@@ -204,7 +227,8 @@ def get_final_metrics(raw_metrics, summarized=True):
         final_metrics['recall'] = np.nan
     final_metrics['f1'] = f_beta(final_metrics['precision'], final_metrics['recall'], 1)
     final_metrics['f0.5'] = f_beta(final_metrics['precision'], final_metrics['recall'], 0.5)
-    final_metrics['raw'] = raw_metrics
+    final_metrics['num_values'] = num_values
+    final_metrics['num_samples'] = num_samples
 
     if summarized:
         return summarize_metrics(final_metrics)
@@ -218,7 +242,7 @@ def summarize_metrics(all_metrics):
     :param all_metrics:
     :return:
     """
-    metric_names = ['f1', 'recall', 'precision', 'f0.5']  # The keys to keep
+    metric_names = ['f1', 'recall', 'precision', 'f0.5', 'num_samples','num_metrics']  # The keys to keep
     return dict((k, all_metrics[k]) for k in metric_names if k in all_metrics)
 
 
@@ -230,6 +254,6 @@ def f_beta(precision, recall, beta):
     :param beta: a double with the beta parameter of the F measure, which gives more or less weight to precision vs. recall
     :return: a double value of the f(beta) measure.
     """
-    if np.isnan(precision) or np.isnan(recall):
+    if np.isnan(precision) or np.isnan(recall) or (precision == 0 and recall == 0):
         return np.nan
     return ((1 + beta ** 2) * precision * recall) / (((beta ** 2) * precision) + recall)

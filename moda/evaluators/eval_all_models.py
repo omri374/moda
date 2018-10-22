@@ -4,7 +4,7 @@ import os
 import numpy as np
 from comet_ml import Experiment
 
-from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics
+from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics
 from moda.models import AzureAnomalyTrendinessDetector
 from moda.dataprep import read_data
 from moda.models import MovingAverageSeasonalTrendinessDetector
@@ -12,7 +12,7 @@ from moda.models import STLTrendinessDetector
 from moda.models import TwitterAnomalyTrendinessDetector
 
 
-def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[]):
+def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[],window_size_for_metrics = 3):
     try:
         dataset = read_data(datapath, min_date=min_date)
     except:
@@ -31,7 +31,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
 
     print("min value for prediction = " + str(min_value))
 
-    window_size_for_metrics = 3
+
 
     # MA model
     if 'ma_seasonal' in models_to_run or len(models_to_run) == 0:
@@ -53,7 +53,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
                               'min_value': min_value
                               }
                     metrics = result[model.__name__]
-                    metrics.pop('raw', None)
+                    metrics = summarize_metrics(metrics)
 
                 log_experiment(datapath, dataset, model, parameters=params, metrics=metrics)
 
@@ -77,7 +77,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
                                   'lo_frac': lo_frac
                                   }
                         metrics = result[model.__name__]
-                        metrics.pop('raw', None)
+                        metrics = summarize_metrics(metrics)
                         log_experiment(datapath, dataset, model, parameters=params, metrics=metrics)
     # Twitter
     if 'twitter' in models_to_run or len(models_to_run) == 0:
@@ -102,7 +102,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
                                   'min_value': min_value
                                   }
                         metrics = result[model.__name__]
-                        metrics.pop('raw', None)
+                        metrics = summarize_metrics(metrics)
                         log_experiment(datapath, dataset, model, parameters=params, metrics=metrics)
 
     if 'azure' in models_to_run or len(models_to_run) == 0:
@@ -124,7 +124,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
             prediction = model.tune_prediction(prediction, sens)
             raw_metrics = get_metrics_for_all_categories(X[['value']], prediction[['prediction']], y[['label']],
                                                          window_size_for_metrics=5)
-            metrics = summarize_metrics(raw_metrics)
+            metrics = get_final_metrics(raw_metrics)
             result = {}
             result[model.__name__] = metrics
             print_azure_model(datapath, min_value, model, result, sens)
@@ -135,7 +135,7 @@ def eval_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H
                           'window_size_for_metrics': window_size_for_metrics
                           }
                 metrics = result[model.__name__]
-                metrics.pop('raw', None)
+                metrics = summarize_metrics(metrics)
                 log_experiment(datapath, dataset, model, parameters=params, metrics=metrics)
 
 
@@ -226,7 +226,7 @@ if __name__ == '__main__':
     datapath = "../datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
     if model == 'all':
         print("Loading file {0}. Evaluating all models".format(datapath))
-        eval_all_models(datapath=datapath, freq=freqs[freq])
+        evaluate_all_models(datapath=datapath, freq=freqs[freq])
     else:
         print("Loading file {0}. Evaluating models {1}".format(datapath, models[model]))
-        eval_all_models(datapath=datapath, freq=freqs[freq], models_to_run=models[model])
+        evaluate_all_models(datapath=datapath, freq=freqs[freq], models_to_run=models[model])
