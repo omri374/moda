@@ -5,6 +5,7 @@ import time
 
 import numpy as np
 import pandas as pd
+from keras.backend import clear_session
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.models.trend_detector import AbstractTrendDetector
@@ -39,8 +40,8 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
     """
 
-    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None, window_size=24, batch_size=60,
-                 epochs=10,
+    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None, window_size=24, batch_size=200,
+                 epochs=40,
                  resample=True, min_periods=10, lookback='30D'):
         super(LSTMTrendinessDetector, self).__init__(freq, is_multicategory, resample)
         self.lookback = lookback
@@ -100,6 +101,11 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         preds = self.model[category].predict(test_X)
 
         from sklearn.metrics import mean_squared_error
+
+        # clear session
+        clear_session()
+        del self.model
+
 
         actual = test_y
         prediction = preds

@@ -6,7 +6,7 @@ from comet_ml import Experiment
 
 from moda.dataprep import read_data
 from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics
-from moda.models import AzureAnomalyTrendinessDetector
+from moda.models import AzureAnomalyTrendinessDetector, LSTMTrendinessDetector
 from moda.models import MovingAverageSeasonalTrendinessDetector
 from moda.models import STLTrendinessDetector
 from moda.models import TwitterAnomalyTrendinessDetector
@@ -31,6 +31,24 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
         min_value = 8
 
     print("min value for prediction = " + str(min_value))
+
+    # LSTM model
+    if 'lstm' in models_to_run:
+        print("Evaluating LSTM model")
+        num_std = 3
+        model = LSTMTrendinessDetector(is_multicategory=True, num_of_std=num_std, freq=freq, min_value=min_value)
+        result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
+                             window_size_for_metrics=window_size_for_metrics)
+
+        print_lstm_model(datapath, min_value, model, result)
+
+        if use_comet:
+            params = {'num_std': num_std,
+                      'window_size_for_metrics': window_size_for_metrics
+                      }
+            metrics = result[model.__name__]
+            metrics = summarize_metrics(metrics)
+            log_experiment(datapath, dataset, model, parameters=params, metrics=metrics)
 
     # MA model
     if 'ma_seasonal' in models_to_run or len(models_to_run) == 0:
@@ -147,6 +165,15 @@ def print_azure_model(datapath, min_value, model, result, sens):
           ", recall = " + str(result[model.__name__]['recall']))
 
 
+def print_lstm_model(datapath, min_value, model, result):
+    print("Evaluating LSTM")
+    print('min_value = ' + str(min_value) +
+          ', dataset = ' + datapath)
+    print('F1 score = ' + str(result[model.__name__]['f1']) +
+          ", precision = " + str(result[model.__name__]['precision']) +
+          ", recall = " + str(result[model.__name__]['recall']))
+
+
 def print_twitter_result(alpha, datapath, min_value, model, result, threshold):
     print("Evaluating Twitter")
     if threshold is None:
@@ -210,7 +237,7 @@ if __name__ == '__main__':
 
     freqs = {'1': '30min', '2': '1H', '3': '3H', '4': '12H', '5': '24H'}
     cities = {'1': 'Corona', '2': 'Pompano', '3': 'SF'}
-    models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure'}
+    models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure', 'l': 'lstm'}
 
     city = 0
     while city not in ['1', '2', '3']:
@@ -221,9 +248,10 @@ if __name__ == '__main__':
         freq = input("Select time frequency: 30min (1), 1H (2), 3H (3), 12H (4) or 24H (5): ")
 
     model = 0
-    while model not in ['s', 'm', 't', 'a', 'all']:
+    while model not in ['s', 'm', 't', 'a', 'l', 'all']:
         model = input(
-            "Select model to run: stl (s), ma_seasonal (m), twitter (t),azure anomaly finder (a) or all (all): ")
+            "Select model to run: stl (s), ma_seasonal (m), twitter (t), "
+            "azure anomaly finder (a), lstm (l) or all (all): ")
 
     datapath = "../datasets/{0}{1}_labeled.csv".format(cities[city], freqs[freq])
     if model == 'all':
