@@ -6,11 +6,10 @@ import requests
 
 from moda.models.trend_detector import AbstractTrendDetector, MIN_SAMPLES_PER_CATEGORY
 
-ENDPOINT = "https://api.labs.cognitive.microsoft.com/anomalyfinder/v1.0/anomalydetection"
-
 
 class AzureAnomalyTrendinessDetector(AbstractTrendDetector):
     GENERAL_CATEGORY = 'general'
+    ENDPOINT = "https://api.labs.cognitive.microsoft.com/anomalyfinder/v1.0/anomalydetection"
 
     __name__ = 'AzureAnomalyTrendinessDetector'
 
