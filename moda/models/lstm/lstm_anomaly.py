@@ -39,7 +39,7 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
     """
 
-    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None, window_size=24, batch_size=256,
+    def __init__(self, freq, is_multicategory=True, num_of_std=3, min_value=None, window_size=24, batch_size=60,
                  epochs=10,
                  resample=True, min_periods=10, lookback='30D'):
         super(LSTMTrendinessDetector, self).__init__(freq, is_multicategory, resample)
