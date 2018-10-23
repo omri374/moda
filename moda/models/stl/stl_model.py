@@ -47,8 +47,23 @@ class STLTrendinessDetector(AbstractTrendDetector):
         self.anomaly_type = anomaly_type
         self.min_periods = min_periods
         self.lookback = lookback
-
         self.HOURS_IN_NANOSECONDS = (1000000000 * 60 * 60)
+
+        self.print_summary()
+
+    def print_summary(self):
+        print("STL Initialized with this params:")
+        print("freq = {}".format(self.freq))
+        print("is_multicategory = {}".format(self.is_multicategory))
+        print("lo_delta = {}".format(self.lo_delta))
+        print("lo_frac = {}".format(self.lo_frac))
+        print("num_of_std = {}".format(self.num_of_std))
+        print("seasonality = {}".format(self.seasonality))
+        print("min_value = {}".format(self.min_value))
+        print("anomaly_type = {}".format(self.anomaly_type))
+        print("resample = {}".format(self.resample))
+        print("min_periods = {}".format(self.min_periods))
+        print("lookback = {}".format(self.lookback))
 
     def fit_one_category(self, dataset, category=None, verbose=False):
         """Returns anomalies of the trend based on a k*sd heuristic
@@ -126,7 +141,7 @@ class STLTrendinessDetector(AbstractTrendDetector):
 
         results['residual_anomaly'] = np.where(
             residual > (results['residual_median'] + (results['residual_std'] * self.num_of_std)), 1, 0)
-        results['trend_anomaly'] = np.where(trend > results['trend_median'] + (results['trend_std'] * self.num_of_std),
+        results['trend_anomaly'] = np.where(trend > (results['trend_median'] + (results['trend_std'] * self.num_of_std)),
                                             1, 0)
 
         if self.anomaly_type == 'or':
@@ -202,7 +217,7 @@ class STLTrendinessDetector(AbstractTrendDetector):
         else:
             category_dataset = self.input_data
 
-        if len(category_dataset < 10):
+        if len(category_dataset) < 10:
             print("Not enough samples to plot.")
             return
 

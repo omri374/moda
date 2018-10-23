@@ -81,8 +81,10 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
 
         # Fit model
         start = time.time()
-        model.fit(train_X, train_y, batch_size=self.batch_size, epochs=self.epochs, validation_split=0.1,
-                  callbacks=[EarlyStopping(patience=2)])
+        history = model.fit(train_X, train_y, batch_size=max(self.batch_size,len(train_X)),
+                            epochs=self.epochs,
+                            validation_split=0.1,
+                            callbacks=[EarlyStopping(patience=4)])
         print("> Compilation Time : ", time.time() - start)
 
         self.model[category] = model

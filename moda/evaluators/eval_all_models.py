@@ -4,15 +4,16 @@ import os
 import numpy as np
 from comet_ml import Experiment
 
+from moda.dataprep import read_data
 from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics
 from moda.models import AzureAnomalyTrendinessDetector
-from moda.dataprep import read_data
 from moda.models import MovingAverageSeasonalTrendinessDetector
 from moda.models import STLTrendinessDetector
 from moda.models import TwitterAnomalyTrendinessDetector
 
 
-def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[],window_size_for_metrics = 3):
+def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[],
+                        window_size_for_metrics=5):
     try:
         dataset = read_data(datapath, min_date=min_date)
     except:
@@ -31,20 +32,17 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
 
     print("min value for prediction = " + str(min_value))
 
-
-
     # MA model
     if 'ma_seasonal' in models_to_run or len(models_to_run) == 0:
         print("Evaluating MA model")
         anomaly_types = ['residual', 'trend', 'and', 'or']
-        for num_std in [2, 2.5, 3, 3.5, 4]:
+        for num_std in [2.5, 3, 3.5, 4]:
             for anomaly_type in anomaly_types:
                 model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
                                                                 anomaly_type=anomaly_type, num_of_std=num_std)
                 result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
                                      window_size_for_metrics=window_size_for_metrics)
                 print_ma_result(anomaly_type, datapath, min_value, model, num_std, result)
-                # model.plot(labels = y.reset_index().set_index('date'))
 
                 if use_comet:
                     params = {'anomaly_type': anomaly_type,
@@ -60,9 +58,9 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
     # STL model
     if 'stl' in models_to_run or len(models_to_run) == 0:
         print("Evaluating STL model")
-        for num_std in [2, 2.5, 3, 3.5, 4]:
+        for num_std in [2.5, 3, 3.5, 4]:
             for anomaly_type in anomaly_types:
-                for lo_frac in [0, 0.1, 0.5, 1]:
+                for lo_frac in [0.1, 0.5, 1, 1.5]:
                     model = STLTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
                                                   anomaly_type=anomaly_type, num_of_std=num_std, lo_frac=lo_frac)
                     result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
@@ -118,7 +116,7 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
         # Call Azure Anomaly Detector API
         prediction = model.predict(dataset, verbose=True)
 
-        sensitivity =  [None, 0.3, 0.5, 1, 1.5, 2]
+        sensitivity = [None, 0.3, 0.5, 1, 1.5, 2]
         for sens in sensitivity:
             print("sensitivity = {}".format(sens))
             prediction = model.tune_prediction(prediction, sens)
@@ -140,6 +138,7 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
 
 
 def print_azure_model(datapath, min_value, model, result, sens):
+    print("Evaluating Azure")
     print('sens = ' + str(sens) +
           ' min_value = ' + str(min_value) +
           ', dataset = ' + datapath)
@@ -149,6 +148,7 @@ def print_azure_model(datapath, min_value, model, result, sens):
 
 
 def print_twitter_result(alpha, datapath, min_value, model, result, threshold):
+    print("Evaluating Twitter")
     if threshold is None:
         print('Threshold = None, Alpha = ' + str(alpha) + ', max_anoms = None, min_value = ' + str(
             min_value) + ', dataset = ' + datapath)
@@ -161,6 +161,7 @@ def print_twitter_result(alpha, datapath, min_value, model, result, threshold):
 
 
 def print_stl_result(anomaly_type, datapath, min_value, model, num_std, result):
+    print("Evaluating STL")
     print('num_std = ' + str(num_std) + ', anomaly_type = ' + str(anomaly_type) + ', min_value = ' + str(
         min_value) + ', dataset = ' + datapath)
     print('F1 score = ' + str(result[model.__name__]['f1']) + ", precision = " + str(result[model.__name__][
@@ -169,6 +170,7 @@ def print_stl_result(anomaly_type, datapath, min_value, model, num_std, result):
 
 
 def print_ma_result(anomaly_type, datapath, min_value, model, num_std, result):
+    print("Evaluating MA")
     print('num_std = ' + str(num_std) + ', anomaly_type = ' + str(anomaly_type) + ', min_value = ' + str(
         min_value) + ', dataset = ' + datapath)
     print('F1 score = ' + str(result[model.__name__]['f1']) + ", precision = " + str(result[model.__name__][

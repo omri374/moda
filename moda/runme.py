@@ -4,35 +4,41 @@ import os
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics, evaluate_all_models
 from moda.dataprep import read_data
 from moda.models import TwitterAnomalyTrendinessDetector, MovingAverageSeasonalTrendinessDetector, \
-    STLTrendinessDetector, AzureAnomalyTrendinessDetector
+    STLTrendinessDetector, AzureAnomalyTrendinessDetector, LSTMTrendinessDetector
 
 
-def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl', min_value=10,
+def run_model(datapath, freq, min_date='01-01-2018', plot=True, model_name='stl', min_value=9,
               min_samples_for_category=100):
     print("Loading file {0}, with frequency {1}. Model name = {2}".format(datapath, freq, model_name))
     dataset = read_data(datapath, min_date=min_date)
     dataset = dataset.rename(columns={'is_anomaly': 'label'})
 
+    is_multicategory = ('category' in dataset) or ('category' in dataset.index)
+
     if model_name == 'twitter':
-        model = TwitterAnomalyTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value, threshold=None,
+        model = TwitterAnomalyTrendinessDetector(is_multicategory=is_multicategory, freq=freq, min_value=min_value, threshold=None,
                                                  max_anoms=0.49, seasonality_freq=7)
 
     if model_name == 'ma_seasonal':
-        model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
+        model = MovingAverageSeasonalTrendinessDetector(is_multicategory=is_multicategory, freq=freq, min_value=min_value,
                                                         anomaly_type='or',
                                                         num_of_std=3)
 
     if model_name == 'stl':
-        model = STLTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
+        model = STLTrendinessDetector(is_multicategory=is_multicategory, freq=freq, min_value=min_value,
                                       anomaly_type='or',
-                                      num_of_std=2.5, lo_delta=0)
+                                      num_of_std=4, lo_frac=0.5)
 
     if model_name == 'azure':
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'config/config.json')
         subscription_key = get_azure_subscription_key(filename)
-        model = AzureAnomalyTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
+        model = AzureAnomalyTrendinessDetector(is_multicategory=is_multicategory, freq=freq, min_value=min_value,
                                                subscription_key=subscription_key)
+
+    if model_name == 'lstm':
+        model = LSTMTrendinessDetector(freq=freq, is_multicategory=is_multicategory)
+
 
     prediction = model.predict(dataset, verbose=True)
     raw_metrics = get_metrics_for_all_categories(dataset[['value']], prediction[['prediction']], dataset[['label']],
@@ -65,7 +71,7 @@ if __name__ == '__main__':
 
     freqs = {'1': '30min', '2': '1H', '3': '3H', '4': '12H', '5': '24H'}
     cities = {'1': 'Corona', '2': 'Pompano', '3': 'SF'}
-    models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure'}
+    models = {'s': 'stl', 'm': 'ma_seasonal', 't': 'twitter', 'a': 'azure', 'l': 'lstm'}
 
     datapath = input("Enter file name or press enter for predefined datasets: ")
 
@@ -84,8 +90,8 @@ if __name__ == '__main__':
         inp1 = input("Run one model (r) or evaluate all models? (e)?")
 
     if inp1 == 'r':
-        model = input("Select model: Moving Averages (m), STL (s), Twitter (t), Azure Anomaly Detector (a):")
-        prediction = run_model(datapath=datapath, freq=freqs[city], model_name=models[model])
+        model = input("Select model: Moving Averages (m), STL (s), Twitter (t), Azure Anomaly Detector (a), LSTM (l):")
+        prediction = run_model(datapath=datapath, freq=freqs[freq], model_name=models[model])
     if inp1 == 'e':
         print("Loading file {0}. Evaluating all models".format(datapath))
         evaluate_all_models(datapath=datapath, freq=freqs[freq])
