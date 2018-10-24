@@ -26,7 +26,7 @@ ranged_ts = ts_to_range(ts,time_range=TIME_RANGE)
 
 ### Run a model
 
-The following code snippet shows how to run one model using moda:
+Run one model, and extract metrics using a manually labeled set
 
 ```
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
@@ -38,7 +38,7 @@ model = STLTrendinessDetector(freq='24H',
                               anomaly_type='residual',
                               num_of_std=3, lo_delta=0)
 
-# There is no fit/predict here. We take the entire time series and can evaluate anomalies on all of it or just the last window(s)
+# Take the entire time series and evaluate anomalies on all of it or just the last window(s)
 prediction = model.predict(dataset)
 raw_metrics = get_metrics_for_all_categories(dataset[['value']], prediction[['prediction']], dataset[['label']],
                                              window_size_for_metrics=1)
@@ -52,13 +52,22 @@ model.plot(labels=dataset['label'])
 
 ### Model evaluation
 
-Moda provides functionality for testing models. Here's an example of doing time-series-cross-validation (using scikit-learn TimeSeriesSplit)
+Example for a train/test split and evaluation
+```
+model = STLTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,
+                              anomaly_type='and', num_of_std=3)
+result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
+                     window_size_for_metrics=2)
+```
+
+Example for Time-series-cross-validation (using scikit-learn TimeSeriesSplit)
 ```
 model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,            
                                                 anomaly_type='and', num_of_std=3)                    
 result = eval_models(X, y, [model], label_col_name='label', train_percent=20, 
-                     window_size_for_metrics=window_size_for_metrics)         
+                     window_size_for_metrics=2)         
 ```
+
 
 
 ## Models currently included:
