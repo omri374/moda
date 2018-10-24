@@ -106,13 +106,15 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         clear_session()
         del self.model
 
-
         actual = test_y
         prediction = preds
+
+
         mse = mean_squared_error(actual, prediction)
         print("MSE=" + str(mse))
+
         results = pd.DataFrame(
-            {"date": X.index, "prediction": preds.squeeze(), "actual": test_y, "diff": test_y - preds.squeeze()})
+            {"date": X.index[self.window_size:], "prediction": preds.squeeze(), "actual": test_y, "diff": test_y - preds.squeeze()})
         results['diff_rolling_std'] = results['diff'].rolling(self.lookback,
                                                               min_periods=self.min_periods).std()  # naive version where we look at the standard deviation of the difference between predicted and actual in a previous window.
         results['prediction'] = np.where(results['diff'] > self.num_of_std * results['diff_rolling_std'], 1, 0)

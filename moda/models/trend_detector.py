@@ -1,3 +1,4 @@
+import gc
 import os
 from abc import ABC, abstractmethod
 
@@ -68,6 +69,9 @@ class AbstractTrendDetector(ABC):
             # one_category = one_category.asfreq(freq = self.freq)
             self.fit_one_category(one_category, category=category, verbose=verbose)
 
+            # Collect garbage to avoid memory issues using Tensorflow
+            gc.collect()
+
     @abstractmethod
     def predict_one_category(self, X, category):
         pass
@@ -93,6 +97,8 @@ class AbstractTrendDetector(ABC):
             res = self.predict_one_category(one_category, category)
             res['category'] = category
             output = pd.concat([output, res],sort=True)
+            # Collect garbage to avoid memory issues using Tensorflow
+            gc.collect()
 
         if self.is_multicategory:
             output = output.reset_index().set_index(['date', 'category'])
