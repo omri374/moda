@@ -79,6 +79,7 @@ A wrapper on statsmodel's seasonal_decompose. A naive decomposition which uses a
 
 STL uses iterative Loess smoothing to obtain an estimate of the trend and then Loess smoothing again to extract a changing additive seasonal component. It can handle any type of seasonality, and the seasonality value can change over time. We used the same anomaly detection mechanism as the moving-average based seasonal decomposition.
 Wrapper on (https://github.com/jrmontag/STLDecompose)
+
 3. Azure anomaly detector
 
 Use the Azure Anomaly Detector cognitive service as a black box for detecting anomalies. Azure Anomaly finder provides an upper bound that can be used to estimate the degree of anomaly.
