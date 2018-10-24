@@ -1,5 +1,6 @@
 # Moda
-### Models and evaluation framework for trending topics detection
+Models and evaluation framework for trending topics detection and anomaly detection.
+
 
 Moda provides an interface for evaluating models on either univariate or multi-category time-series datasets. It further allows the user to add additional models using a scikit-learn style API. All models provided in Moda were adapted to a multi-category scenario using by wrapping a univariate model to run on multiple categories. It further allows the evaluation of models using either a train/test split or a time-series cross validation.
 
@@ -84,11 +85,10 @@ This functionality allows you to run a specific model included in moda on your d
 To run and evaluate a specific model, either run runme.py or this code:
 ```
 dataset = read_data(datapath)
-model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
+model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,
                                                         anomaly_type='or', num_of_std=3)
 prediction = model.predict(dataset)
-raw_metrics = get_evaluation_metrics(dataset[['value']], prediction[['prediction']], dataset[['label']],
-                                         window_size_for_metrics=5)
+raw_metrics = get_evaluation_metrics(dataset[['value']], prediction[['prediction']], dataset[['label']])
 metrics = get_final_metrics(raw_metrics)
 print(metrics)
 model.plot(labels=dataset['label'])
