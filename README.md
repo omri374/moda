@@ -86,6 +86,7 @@ Use the Azure Anomaly Detector cognitive service as a black box for detecting an
 4. Twitter
 
 A wrapper on Twitter's AnomalyDetection package (https://github.com/Marcnuth/AnomalyDetection)
+
 5. LSTMs
 
 Trains a forecasting LSTM model, and compares the prediction value at time t vs. the actual value at time t. Then, estimate the difference by comparison to the standard deviation of previous differences.
