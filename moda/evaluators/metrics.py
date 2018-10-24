@@ -101,7 +101,12 @@ def _get_metrics_for_one_category(dataset, label_col_name, prediction_col_name, 
     # Calculate additional accumulators
     new_metrics['num_samples'] += len(category_results)
     new_metrics['num_values'] += np.sum(category_results[value_col_name])
-
+    if 'TP' not in new_metrics:
+        new_metrics['TP']=np.NaN
+    if 'FP' not in new_metrics:
+        new_metrics['FP'] = np.NaN
+    if 'FN' not in new_metrics:
+        new_metrics['FN'] = np.NaN
     new_metrics = _join_metrics(new_metrics, prev_metrics)
 
     return new_metrics
@@ -205,6 +210,8 @@ def get_final_metrics(raw_metrics, summarized=False):
             final_metrics[category]['recall'] = category_tp / (category_tp + category_fn)
             final_metrics[category]['f1'] = f_beta(final_metrics[category]['precision'],
                                                      final_metrics[category]['recall'], 1
+
+
                                                      )
         if 'num_values' in raw_metrics[category]:
             final_metrics[category]['num_values'] = raw_metrics[category]['num_values']
