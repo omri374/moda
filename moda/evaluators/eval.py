@@ -54,7 +54,7 @@ def eval_models(X, y, models, label_col_name='label', prediction_col_name='predi
 
         metrics = eval_one_model(X_train, y_train, X_test, y_test,
                                  model, window_size_for_metrics,
-                                 label_col_name, prediction_col_name, value_col_name, verbose)
+                                 label_col_name, prediction_col_name, value_col_name, return_final_metrics=True)
         counter += 1
         per_model_res[str(model.__name__)] = metrics
 
@@ -110,7 +110,6 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
     for model in models:
         counter = 0
 
-
         tscv = TimeSeriesSplit(n_splits=n_splits)
         if verbose:
             print("Model: {}".format(str(model)))
@@ -131,11 +130,10 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
 
             metrics = eval_one_model(X_train, y_train, X_test, y_test,
                                      model, window_size_for_metrics,
-                                     label_col_name, prediction_col_name, value_col_name, verbose)
-            raw_metrics = metrics['raw']
-            metrics = _join_metrics(raw_metrics, prev_metrics)
+                                     label_col_name, prediction_col_name, value_col_name, return_final_metrics=False)
+            metrics = _join_metrics(metrics, prev_metrics)
 
-        final_metrics = get_final_metrics(metrics,summarized=True)
+        final_metrics = get_final_metrics(metrics, summarized=True)
         if verbose:
             print(final_metrics)
         per_model_res[str(model.__name__)] = final_metrics
@@ -144,7 +142,7 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
 
 def eval_one_model(X_train, y_train, X_test, y_test,
                    model, window_size_for_metrics,
-                   label_col_name='label', prediction_col_name='prediction', value_col_name='value', verbose=False):
+                   label_col_name='label', prediction_col_name='prediction', value_col_name='value',return_final_metrics=True):
     """
     Returns metrics for one model and one pair of train/test sets.
     :param X_train: training set DataFrame
@@ -171,9 +169,10 @@ def eval_one_model(X_train, y_train, X_test, y_test,
                                                      prediction_col_name=prediction_col_name,
                                                      window_size_for_metrics=window_size_for_metrics)
 
-    final_metrics = get_final_metrics(raw_metrics, summarized=False)
-    if verbose:
-        print(final_metrics)
+    if return_final_metrics:
+        final_metrics = get_final_metrics(raw_metrics, summarized=False)
+    else:
+        final_metrics = raw_metrics
     return final_metrics
 
 

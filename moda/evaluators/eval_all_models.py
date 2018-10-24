@@ -5,7 +5,8 @@ import numpy as np
 from comet_ml import Experiment
 
 from moda.dataprep import read_data
-from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics
+from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics, \
+    eval_models_CV
 from moda.models import AzureAnomalyTrendinessDetector, LSTMTrendinessDetector
 from moda.models import MovingAverageSeasonalTrendinessDetector
 from moda.models import STLTrendinessDetector
@@ -58,8 +59,8 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
             for anomaly_type in anomaly_types:
                 model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq=freq, min_value=min_value,
                                                                 anomaly_type=anomaly_type, num_of_std=num_std)
-                result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
-                                     window_size_for_metrics=window_size_for_metrics)
+                result = eval_models_CV(X, y, [model], label_col_name='label', n_splits=5,
+                                        window_size_for_metrics=window_size_for_metrics)
                 print_ma_result(anomaly_type, datapath, min_value, model, num_std, result)
 
                 if use_comet:
