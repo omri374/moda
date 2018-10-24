@@ -1,5 +1,5 @@
 # Moda
-Models and evaluation framework for trending topics detection
+Models and evaluation framework for trending topics detection. It can also be used for anomaly detection.
 
 Moda is a set of models capable of detecting trending topics. Currently supported models:
 - Moving Average based Seasional Decomposition (wrapping statsmodels.seasonal_decompose)
