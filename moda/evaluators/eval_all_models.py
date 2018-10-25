@@ -2,18 +2,18 @@ import json
 import os
 
 import numpy as np
-from comet_ml import Experiment
 
 from moda.dataprep import read_data
 from moda.evaluators import eval_models, get_metrics_for_all_categories, summarize_metrics, get_final_metrics, \
     eval_models_CV
-from moda.models import AzureAnomalyTrendinessDetector, LSTMTrendinessDetector
+from moda.models import AzureAnomalyTrendinessDetector
+from moda.models import LSTMTrendinessDetector
 from moda.models import MovingAverageSeasonalTrendinessDetector
 from moda.models import STLTrendinessDetector
 from moda.models import TwitterAnomalyTrendinessDetector
 
 
-def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[],
+def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=False, models_to_run=[],
                         window_size_for_metrics=1):
     try:
         dataset = read_data(datapath, min_date=min_date)
@@ -33,6 +33,9 @@ def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq
 
     print("min value for prediction = " + str(min_value))
 
+    from comet_ml import Experiment
+
+    
     # LSTM model
     if 'lstm' in models_to_run:
         print("Evaluating LSTM model")
