@@ -207,7 +207,7 @@ def print_ma_result(anomaly_type, datapath, min_value, model, num_std, result):
 
 
 def log_experiment(datapath, dataset, model, parameters, metrics):
-    experiment = Experiment(api_key="Uv0lx3yRDH7kk8h1vtR9ZRiD2s16gnYTxfsvK2VnpV2xRrMbFobYDZRRA4tvoYiR",
+    experiment = Experiment(api_key="COMET_KEY",
                             project_name="trending-topics")
 
     experiment.log_dataset_hash(dataset)
