@@ -14,7 +14,7 @@ from moda.models import TwitterAnomalyTrendinessDetector
 
 
 def evaluate_all_models(datapath="SF3H_labeled.csv", min_date='01-01-2018', freq='3H', use_comet=True, models_to_run=[],
-                        window_size_for_metrics=5):
+                        window_size_for_metrics=1):
     try:
         dataset = read_data(datapath, min_date=min_date)
     except:
