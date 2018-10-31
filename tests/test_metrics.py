@@ -1,6 +1,6 @@
 """Test evaluation functionality."""
 from moda.evaluators import f_beta
-from moda.evaluators.metrics import _calculate_metrics_with_shift, _join_metrics
+from moda.evaluators.metrics import calculate_metrics_with_shift, _join_metrics
 
 
 def test_f_beta1():
@@ -22,7 +22,7 @@ def test_f_beta3():
 def test_calculate_metrics_with_shift_all_zero():
     actual = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     predicted = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 0
     assert metrics['FP'] == 0
     assert metrics['FN'] == 0
@@ -31,13 +31,13 @@ def test_calculate_metrics_with_shift_all_zero():
 def test_calculate_metrics_with_shift_actual_zero():
     actual = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
     predicted = [0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 0
     assert metrics['FP'] == 2
     assert metrics['FN'] == 0
 
     predicted = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 0
     assert metrics['FP'] == 4
     assert metrics['FN'] == 0
@@ -46,13 +46,13 @@ def test_calculate_metrics_with_shift_actual_zero():
 def test_calculate_metrics_with_shift_predicted_zero():
     actual = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
     predicted = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 0
     assert metrics['FP'] == 0
     assert metrics['FN'] == 2
 
     actual = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 0
     assert metrics['FP'] == 0
     assert metrics['FN'] == 4
@@ -61,14 +61,14 @@ def test_calculate_metrics_with_shift_predicted_zero():
 def test_calculate_metrics_with_shift_perfect():
     actual = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
     predicted = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 2
     assert metrics['FP'] == 0
     assert metrics['FN'] == 0
 
     actual = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1]
     predicted = [1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 1]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 4
     assert metrics['FP'] == 0
     assert metrics['FN'] == 0
@@ -77,7 +77,7 @@ def test_calculate_metrics_with_shift_perfect():
 def test_calculate_metrics_with_shift_mixed():
     actual = [0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0]
     predicted = [0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 1
     assert metrics['FP'] == 1
     assert metrics['FN'] == 1
@@ -86,7 +86,7 @@ def test_calculate_metrics_with_shift_mixed():
 def test_calculate_metrics_with_shift_in_window():
     actual = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
     predicted = [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=1)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=1)
     assert metrics['TP'] == 1
     assert metrics['FP'] == 0
     assert metrics['FN'] == 0
@@ -95,7 +95,7 @@ def test_calculate_metrics_with_shift_in_window():
 def test_calculate_metrics_with_shift_in_large_window():
     actual = [0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0]
     predicted = [0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0]
-    metrics = _calculate_metrics_with_shift(predicted, actual, window_size=4)
+    metrics = calculate_metrics_with_shift(predicted, actual, window_size=4)
     assert metrics['TP'] == 1
     assert metrics['FP'] == 0
     assert metrics['FN'] == 0

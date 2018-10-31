@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='moda',
-    version='0.1.5',
+    version='0.2.0',
     packages=['moda.dataprep',
               'moda.evaluators',
               'moda.models'

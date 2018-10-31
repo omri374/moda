@@ -24,7 +24,7 @@ def _initialize_metrics(categories):
     return metrics
 
 
-def _calculate_metrics_with_shift(predicted, actual, window_size=3):
+def calculate_metrics_with_shift(predicted, actual, window_size=3):
     """
     Calculates TP, FP, and FN while allowing shifts. For example,
     predicted = [0,1,0,0], actual [1,0,0,0] and a window_size of 1 would return a TP,
@@ -95,9 +95,9 @@ def _get_metrics_for_one_category(dataset, label_col_name, prediction_col_name, 
     category_results = dataset.loc[pd.IndexSlice[:, category], :]
     category_results.index = category_results.index.remove_unused_levels()
     # Calculate TP, FP and FN
-    new_metrics = _calculate_metrics_with_shift(predicted=category_results[prediction_col_name].values,
-                                                actual=category_results[label_col_name].values,
-                                                window_size=window_size_for_metrics)
+    new_metrics = calculate_metrics_with_shift(predicted=category_results[prediction_col_name].values,
+                                               actual=category_results[label_col_name].values,
+                                               window_size=window_size_for_metrics)
     # Calculate additional accumulators
     new_metrics['num_samples'] += len(category_results)
     new_metrics['num_values'] += np.sum(category_results[value_col_name])
