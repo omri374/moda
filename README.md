@@ -14,11 +14,11 @@ import pandas as pd
 from moda.dataprep import raw_to_ts, ts_to_range
 
 DATAPATH = "example/SF_data/SF311-2008.csv"
-# The dataset can be downloaded from here: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/data
-TIME_RANGE = "3H" # Aggregate all events in the raw data into 3 hour intervals
+# The full dataset can be downloaded from here: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/data
+TIME_RANGE = "24H" # Aggregate all events in the raw data into 3 hour intervals
 
 # Read raw file
-raw = pd.read_csv(DATAPATH,nrows=100000)
+raw = pd.read_csv(DATAPATH)
 
 # Turn the raw data into a time series (with date as a pandas DatetimeIndex)
 ts = raw_to_ts(raw)
