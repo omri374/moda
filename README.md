@@ -27,10 +27,9 @@ ts = raw_to_ts(raw)
 ranged_ts = ts_to_range(ts,time_range=TIME_RANGE)
 ```
 
-### Run a model
+### Run a model:
 
 Run one model, and extract metrics using a manually labeled set
-
 ```
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
 from moda.dataprep import read_data
@@ -57,9 +56,12 @@ model.plot(labels=dataset['label'])
 
 Example for a train/test split and evaluation
 ```
-model = STLTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,
+stl_model = STLTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,
                               anomaly_type='and', num_of_std=3)
-result = eval_models(X, y, [model], label_col_name='label', train_percent=20,
+                              
+twitter_model = TwitterAnomalyTrendinessDetector(is_multicategory=True, freq='3H', min_value=10)                              
+                              
+result = eval_models(X, y, [stl_model,twitter_model], label_col_name='label', train_percent=20,
                      window_size_for_metrics=2)
 ```
 
@@ -67,8 +69,7 @@ Example for Time-series-cross-validation (using scikit-learn TimeSeriesSplit)
 ```
 model = MovingAverageSeasonalTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,            
                                                 anomaly_type='and', num_of_std=3)                    
-result = eval_models(X, y, [model], label_col_name='label', train_percent=20, 
-                     window_size_for_metrics=2)         
+result = eval_models_CV(X, y, [model], n_splits=5, window_size_for_metrics=2)       
 ```
 
 
