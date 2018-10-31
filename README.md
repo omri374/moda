@@ -56,8 +56,7 @@ model.plot(labels=dataset['label'])
 
 Example for a train/test split and evaluation
 ```
-stl_model = STLTrendinessDetector(is_multicategory=True, freq='3H', min_value=10,
-                              anomaly_type='and', num_of_std=3)
+stl_model = STLTrendinessDetector(is_multicategory=True, freq='3H', min_value=10, anomaly_type='and', num_of_std=3)
                               
 twitter_model = TwitterAnomalyTrendinessDetector(is_multicategory=True, freq='3H', min_value=10)                              
                               
