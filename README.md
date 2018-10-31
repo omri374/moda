@@ -5,7 +5,7 @@ Moda provides an interface for evaluating models on either univariate or multi-c
 
 
 ### Models currently included:
-##### A. Moving average based seasonality decomposition (MA adapted for trendiness detection)
+##### A. Moving average based seasonality decomposition (adapted for trendiness detection)
 
 This method is a naive decomposition which uses a moving average to remove the trend, and a convolution filter to detect seasonality. The result is a time series of residuals. In order to detect anomalies and interesting trends in the time series, we look for outliers on the decomposed trend series and the residuals series. Points are considered outliers if their value is higher than a number of standard deviations of the historical values in a previous window. We evaluated different policies for trendiness prediction: 1. residual anomaly only, 2. trend anomaly only, residual OR trend anomaly, residual AND trend anomaly. Figure 6 shows an example of such method and the means to detect anomalies.
 
