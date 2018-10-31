@@ -8,12 +8,14 @@ Moda provides an interface for evaluating models on either univariate or multi-c
 ## Usage
 
 ### Turning an items dataset into a moda dataset:
+moda uses a MultiIndex to hold the datestamp and category. All models have been adapted to accept such structure.
 ```
 import pandas as pd
 from moda.dataprep import raw_to_ts, ts_to_range
 
 DATAPATH = "SF-311_simplified.csv"
-TIME_RANGE = "3H" # Aggregate into 3 hour intervals
+# The dataset can be downloaded from here: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/data
+TIME_RANGE = "3H" # Aggregate all events in the raw data into 3 hour intervals
 
 # Read raw file
 raw = pd.read_csv(DATAPATH)
