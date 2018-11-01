@@ -87,7 +87,7 @@ print('recall = {}'.format(metrics['recall']))
 ## Examples
 A jupyter notebook with this example can be found [here](example.ipynb).
 
-A more detailed example which includes an exploratory data analysis can be found [here](https://raw.githubusercontent.com/omri374/moda/master/moda/example/EDA.ipynb)
+A more detailed example which includes an exploratory data analysis can be found [here](moda/example/EDA.ipynb)
 
 
 ## Models currently included:
@@ -95,7 +95,6 @@ A more detailed example which includes an exploratory data analysis can be found
 
 A wrapper on statsmodel's seasonal_decompose. A naive decomposition which uses a moving average to remove the trend, and a convolution filter to detect seasonality. The result is a time series of residuals. In order to detect anomalies and interesting trends in the time series, we look for outliers on the decomposed trend series and the residuals series. Points are considered outliers if their value is higher than a number of standard deviations of the historical values in a previous window. We evaluated different policies for trendiness prediction: 1. residual anomaly only, 2. trend anomaly only, residual OR trend anomaly, residual AND trend anomaly.
 This is the baseline model, which gives decent results when seasonality is more or less constant.
-
 
 2. Seasonality and trend decomposition using Loess (Adapted STL)
 
@@ -107,8 +106,6 @@ Example output plot for STL:
 ![STL](https://github.com/omri374/moda/raw/master/figs/STL_example.png)
 The left hand side shows the origin (top) and decomposed time series (Seasonal, trend, residual)
 The right hand side shows anomalies found on the residuals time series (top), trend, prediction (combination of residuals and trend anomalies), and ground truth (bottom). 
-
-
 
 3. Azure anomaly detector
 
@@ -123,7 +120,7 @@ This model is similar to (1) and (2), but has a more sophisticated way of detect
 
 Trains a forecasting LSTM model, and compares the prediction value at time t vs. the actual value at time t. Then, estimate the difference by comparison to the standard deviation of previous differences. This is useful only when there exists enough data for representing the time series pattern.
 
-An example on running LSTMs can be found [here](https://raw.githubusercontent.com/omri374/moda/master/moda/example/lstm/LSTM_AD.ipynb)
+An example on running LSTMs can be found [here](moda/example/lstm/LSTM_AD.ipynb)
 
 
 ## Runing tests and linting
