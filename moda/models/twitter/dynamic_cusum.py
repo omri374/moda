@@ -1,4 +1,5 @@
 '''
+Note: code originally from : https://github.com/Marcnuth/AnomalyDetection
 This algorithm focus on detect anomaly based on CUSUM chart.
 '''
 import pandas as pd

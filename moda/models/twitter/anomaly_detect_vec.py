@@ -1,3 +1,7 @@
+'''
+Note: code originally from : https://github.com/Marcnuth/AnomalyDetection
+'''
+
 import numpy as np
 import scipy as sp
 import pandas as pd

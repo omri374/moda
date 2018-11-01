@@ -1,4 +1,6 @@
 '''
+Note: code originally from : https://github.com/Marcnuth/AnomalyDetection
+
 Description:
 
      A technique for detecting anomalies in seasonal univariate time
