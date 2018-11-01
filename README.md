@@ -10,9 +10,11 @@ Moda provides an interface for evaluating models on either univariate or multi-c
 
 ## Usage
 
-### Turning an items dataset into a moda dataset:
-moda uses a MultiIndex to hold the datestamp and category. All models have been adapted to accept such structure.
-```
+### Turning a raw dataset into a moda dataset:
+moda uses a MultiIndex to hold the datestamp and category. All models have been adapted to accept such structure. The input dataset is assumed to have an entry per row and a datestamp column called 'date'. An additional 'category' column is optional.
+As a first step, the dataset is aggregated to a fixed size time interval, and a new dataset with a 'date','category' (optional) and 'value' columns is created. A MultiIndex of 'date' (pandas DatetimeIndex) and 'category' is the dataset's index.
+
+```python
 import pandas as pd
 from moda.dataprep import raw_to_ts, ts_to_range
 
@@ -33,7 +35,7 @@ ranged_ts = ts_to_range(ts,time_range=TIME_RANGE)
 ### Run a model:
 
 Run one model, and extract metrics using a manually labeled set
-```
+```python
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
 from moda.dataprep import read_data
 from moda.models import STLTrendinessDetector
@@ -53,12 +55,10 @@ metrics = get_final_metrics(raw_metrics)
 model.plot(labels=dataset['label'])
 ```
 
-
-
 ### Model evaluation
 
 Example for a train/test split and evaluation
-```
+```python
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
 from moda.dataprep import read_data
 from moda.models import STLTrendinessDetector
@@ -84,6 +84,10 @@ print('recall = {}'.format(metrics['recall']))
 #model.plot(labels=dataset['label'])   
 ```
 
+## Examples
+A jupyter notebook with this example can be found [here](example.ipynb).
+
+A more detailed example which includes an exploratory data analysis can be found [here](https://raw.githubusercontent.com/omri374/moda/master/moda/example/EDA.ipynb)
 
 
 ## Models currently included:
@@ -99,6 +103,13 @@ STL uses iterative Loess smoothing to obtain an estimate of the trend and then L
 Wrapper on (https://github.com/jrmontag/STLDecompose)
 Use this model when trend and seasonality have a more complex pattern. It usually outperforms the moving average model.
 
+Example output plot for STL:
+![STL](https://github.com/omri374/moda/raw/master/figs/STL_example.png)
+The left hand side shows the origin (top) and decomposed time series (Seasonal, trend, residual)
+The right hand side shows anomalies found on the residuals time series (top), trend, prediction (combination of residuals and trend anomalies), and ground truth (bottom). 
+
+
+
 3. Azure anomaly detector
 
 Use the Azure Anomaly Detector cognitive service as a black box for detecting anomalies. Azure Anomaly finder provides an upper bound that can be used to estimate the degree of anomaly. This model is useful when the anomalies have a relatively complex structure
@@ -112,6 +123,8 @@ This model is similar to (1) and (2), but has a more sophisticated way of detect
 
 Trains a forecasting LSTM model, and compares the prediction value at time t vs. the actual value at time t. Then, estimate the difference by comparison to the standard deviation of previous differences. This is useful only when there exists enough data for representing the time series pattern.
 
+An example on running LSTMs can be found [here](https://raw.githubusercontent.com/omri374/moda/master/moda/example/lstm/LSTM_AD.ipynb)
 
-### Runing tests and linting
+
+## Runing tests and linting
 Moda uses pytest for testing. In order to run tests, just call `pytest` from moda's main directory. For linting, this module uses PEP8 conventions.
