@@ -236,7 +236,7 @@ class STLTrendinessDetector(AbstractTrendDetector):
         plt.subplot(427)
         ts_subplot(plt, category_dataset['residual'], label='Residual')
 
-        if 'labels' in category_dataset:
+        if 'label' in category_dataset:
             plt.subplot(428)
             ts_subplot(plt, category_dataset['labels'], label='Labels')
         elif labels is not None:

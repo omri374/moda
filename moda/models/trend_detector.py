@@ -121,33 +121,48 @@ class AbstractTrendDetector(ABC):
     def _type(self):
         return self.__class__.__name__
 
-    def plot(self, labels=None, savefig=True, postfix="", plots_path="plots/"):
+    def plot(self, labels=None, savefig=True, postfix="", plots_path="plots/",specific_category=None):
         import matplotlib.pyplot as plt
 
         if self.input_data is None:
             print("No data found")
 
         if len(self.input_data.keys()) == 1:
-            self.plot_one_category(GENERAL_CATEGORY)
-        else:
-            categories = self.input_data.keys()
+            self.plot_one_category(category=GENERAL_CATEGORY,labels=labels)
+            return
 
-            category_count = 0
-            for category in categories:
-                if labels is not None:
-                    if isinstance(labels.index, pd.MultiIndex):
-                        labels = labels.reset_index().set_index('date')
-                    category_label = labels.loc[labels['category'] == category,]
-                    category_label = category_label.drop(labels="category", axis=1)
-                else:
-                    category_label = None
+        if specific_category is not None:
+            if labels is not None:
+                category_labels = labels.reset_index(level='category')
+                category_labels = category_labels.loc[category_labels['category'] == specific_category,].drop(columns='category')
+            else:
+                category_labels = None
+            self.plot_one_category(category=specific_category,labels=category_labels)
+            return
 
-                plt.clf()
-                plt.figure(category_count, figsize=(20, 10))
-                self.plot_one_category(category=category, labels=category_label)
 
-                if savefig:
-                    strFile = os.path.join(plots_path, self._type() + "-" + str(postfix) + "-" + category + ".png")
-                    if os.path.isfile(strFile):
-                        os.remove(strFile)
-                    plt.savefig(strFile)
+        categories = self.input_data.keys()
+
+        category_count = 0
+        for category in categories:
+            if labels is not None:
+                if isinstance(labels.index, pd.MultiIndex):
+                    labels = labels.reset_index().set_index('date')
+                category_label = labels.loc[labels['category'] == category,]
+                category_label = category_label.drop(labels="category", axis=1)
+            else:
+                category_label = None
+
+            plt.clf()
+            plt.figure(category_count, figsize=(20, 10))
+            self.plot_one_category(category=category, labels=category_label)
+
+            if savefig:
+                strFile = os.path.join(plots_path, self._type() + "-" + str(postfix) + "-" + category + ".png")
+                if os.path.isfile(strFile):
+                    os.remove(strFile)
+                plt.savefig(strFile)
+
+    @abstractmethod
+    def plot_one_category(self, category=None, labels=None):
+        pass

@@ -20,3 +20,6 @@ class MockModel(AbstractTrendDetector):
     def fit_one_category(self, dataset, category=None, verbose=False):
         pass
 
+    def plot_one_category(self, category=None, labels=None):
+        pass
+

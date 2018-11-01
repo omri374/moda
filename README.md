@@ -5,6 +5,9 @@
 
 Moda provides an interface for evaluating models on either univariate or multi-category time-series datasets. It further allows the user to add additional models using a scikit-learn style API. All models provided in Moda were adapted to a multi-category scenario using by wrapping a univariate model to run on multiple categories. It further allows the evaluation of models using either a train/test split or a time-series cross validation.
 
+## Installation
+`pip install moda`
+
 ## Usage
 
 ### Turning an items dataset into a moda dataset:
@@ -86,23 +89,29 @@ print('recall = {}'.format(metrics['recall']))
 ## Models currently included:
 1. Moving average based seasonality decomposition (MA adapted for trendiness detection)
 
-A wrapper on statsmodel's seasonal_decompose. A naive decomposition which uses a moving average to remove the trend, and a convolution filter to detect seasonality. The result is a time series of residuals. In order to detect anomalies and interesting trends in the time series, we look for outliers on the decomposed trend series and the residuals series. Points are considered outliers if their value is higher than a number of standard deviations of the historical values in a previous window. We evaluated different policies for trendiness prediction: 1. residual anomaly only, 2. trend anomaly only, residual OR trend anomaly, residual AND trend anomaly. Figure 6 shows an example of such method and the means to detect anomalies.
+A wrapper on statsmodel's seasonal_decompose. A naive decomposition which uses a moving average to remove the trend, and a convolution filter to detect seasonality. The result is a time series of residuals. In order to detect anomalies and interesting trends in the time series, we look for outliers on the decomposed trend series and the residuals series. Points are considered outliers if their value is higher than a number of standard deviations of the historical values in a previous window. We evaluated different policies for trendiness prediction: 1. residual anomaly only, 2. trend anomaly only, residual OR trend anomaly, residual AND trend anomaly.
+This is the baseline model, which gives decent results when seasonality is more or less constant.
+
 
 2. Seasonality and trend decomposition using Loess (Adapted STL)
 
 STL uses iterative Loess smoothing to obtain an estimate of the trend and then Loess smoothing again to extract a changing additive seasonal component. It can handle any type of seasonality, and the seasonality value can change over time. We used the same anomaly detection mechanism as the moving-average based seasonal decomposition.
 Wrapper on (https://github.com/jrmontag/STLDecompose)
+Use this model when trend and seasonality have a more complex pattern. It usually outperforms the moving average model.
 
 3. Azure anomaly detector
 
-Use the Azure Anomaly Detector cognitive service as a black box for detecting anomalies. Azure Anomaly finder provides an upper bound that can be used to estimate the degree of anomaly.
+Use the Azure Anomaly Detector cognitive service as a black box for detecting anomalies. Azure Anomaly finder provides an upper bound that can be used to estimate the degree of anomaly. This model is useful when the anomalies have a relatively complex structure
 
 4. Twitter
 
 A wrapper on Twitter's AnomalyDetection package (https://github.com/Marcnuth/AnomalyDetection)
+This model is similar to (1) and (2), but has a more sophisticated way of detecting the anomalies once the time series is analyzed.
 
 5. LSTMs
 
-Trains a forecasting LSTM model, and compares the prediction value at time t vs. the actual value at time t. Then, estimate the difference by comparison to the standard deviation of previous differences.
+Trains a forecasting LSTM model, and compares the prediction value at time t vs. the actual value at time t. Then, estimate the difference by comparison to the standard deviation of previous differences. This is useful only when there exists enough data for representing the time series pattern.
 
 
+### Runing tests and linting
+Moda uses pytest for testing. In order to run tests, just call `pytest` from moda's main directory. For linting, this module uses PEP8 conventions.
