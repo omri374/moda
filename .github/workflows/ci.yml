@@ -17,20 +17,21 @@ jobs:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-    - uses: actions/checkout@v2
+    strategy:
+      matrix:
+        python-version: [3.7, 3.8]
 
-    - name: Setup Python
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
-        # Version range or exact version of a Python version to use, using SemVer's version range syntax.
-        python-version: # optional, default is 3.x
-        # The target architecture (x86, x64) of the Python interpreter.
-        architecture: # optional
-        # Used to pull python distributions from actions/python-versions. Since there's a default, this is typically not supplied by the user.
-        token: # optional, default is ${{ github.token }}
-
-    - name: Python Pytest Github Action
-      uses: fylein/python-pytest-github-action@v2
+        python-version: ${{ matrix.python-version }}
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Test with pytest
+      run: |
+        pytest
