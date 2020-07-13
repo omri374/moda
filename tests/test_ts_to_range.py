@@ -2,8 +2,7 @@ import os
 
 import pandas as pd
 
-from moda.dataprep import raw_to_ts
-from moda.dataprep.ts_to_range import ts_to_range
+from moda.dataprep import raw_to_ts, ts_to_range
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

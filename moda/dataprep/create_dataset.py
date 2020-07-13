@@ -36,10 +36,10 @@ def split_history_and_current(windowed_ts):
     return (X, y)
 
 
-if __name__ == '__main__':
-    ranged_ts = pd.DataFrame({'date': range(6), 'value': range(6)})
-    ranged_ts['date'] = pd.to_datetime(ranged_ts['date'])
-    ranged_ts = ranged_ts.set_index(pd.DatetimeIndex(ranged_ts['date']))
-    ranged_ts = ranged_ts.drop(columns='date')
+if __name__ == "__main__":
+    ranged_ts = pd.DataFrame({"date": range(6), "value": range(6)})
+    ranged_ts["date"] = pd.to_datetime(ranged_ts["date"])
+    ranged_ts = ranged_ts.set_index(pd.DatetimeIndex(ranged_ts["date"]))
+    ranged_ts = ranged_ts.drop(columns="date")
     ranged_ts.head()
     windowed_df = get_windowed_ts(ranged_ts, window_size=3, with_actual=False)

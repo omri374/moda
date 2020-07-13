@@ -1,9 +1,24 @@
-from moda.evaluators.metrics import get_metrics_for_all_categories, _join_metrics, _initialize_metrics, \
-    get_final_metrics
+from moda.evaluators.metrics import (
+    get_metrics_for_all_categories,
+    _join_metrics,
+    _initialize_metrics,
+    get_final_metrics,
+)
+
+from sklearn.model_selection import TimeSeriesSplit
 
 
-def eval_models(X, y, models, label_col_name='label', prediction_col_name='prediction', value_col_name='value',
-                verbose=False, window_size_for_metrics=3, train_percent=70):
+def eval_models(
+    X,
+    y,
+    models,
+    label_col_name="label",
+    prediction_col_name="prediction",
+    value_col_name="value",
+    verbose=False,
+    window_size_for_metrics=3,
+    train_percent=70,
+):
     """Evalutes one or more modeling with the provided datasets
 
      Parameters
@@ -37,8 +52,8 @@ def eval_models(X, y, models, label_col_name='label', prediction_col_name='predi
     date_time_index = X.index.levels[0]
     num_dates = len(date_time_index)
 
-    train = date_time_index[:int(num_dates * train_percent / 100)]
-    test = date_time_index[int(num_dates * train_percent / 100):]
+    train = date_time_index[: int(num_dates * train_percent / 100)]
+    test = date_time_index[int(num_dates * train_percent / 100) :]
 
     for model in models:
         counter = 0
@@ -52,17 +67,35 @@ def eval_models(X, y, models, label_col_name='label', prediction_col_name='predi
         X_test = _slice_set(X, test)
         y_test = _slice_set(y, test)
 
-        metrics = eval_one_model(X_train, y_train, X_test, y_test,
-                                 model, window_size_for_metrics,
-                                 label_col_name, prediction_col_name, value_col_name, return_final_metrics=True)
+        metrics = eval_one_model(
+            X_train,
+            y_train,
+            X_test,
+            y_test,
+            model,
+            window_size_for_metrics,
+            label_col_name,
+            prediction_col_name,
+            value_col_name,
+            return_final_metrics=True,
+        )
         counter += 1
         per_model_res[str(model.__name__)] = metrics
 
     return per_model_res
 
 
-def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='prediction', value_col_name='value',
-                   n_splits=None, verbose=True, window_size_for_metrics=3):
+def eval_models_CV(
+    X,
+    y,
+    models,
+    label_col_name="label",
+    prediction_col_name="prediction",
+    value_col_name="value",
+    n_splits=None,
+    verbose=True,
+    window_size_for_metrics=3,
+):
     """Evalutes one or more modeling with the provided datasets, using time series cross validation
 
     Parameters
@@ -89,8 +122,6 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
     res : a dictionary of metrics per model
     """
 
-    from sklearn.model_selection import TimeSeriesSplit
-
     if X is None:
         raise TypeError
     if y is None:
@@ -102,7 +133,11 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
 
     if n_splits > len(X.index.levels[0]):
         n_splits = int(len(X.index.levels[0]) / 2)
-        print("Warning: n_splits cannot be larger than the number of dates. Reducing n_splits to {}".format(n_splits))
+        print(
+            "Warning: n_splits cannot be larger than the number of dates. Reducing n_splits to {}".format(
+                n_splits
+            )
+        )
 
     per_model_res = {}
 
@@ -119,8 +154,10 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
 
         for train, test in tscv.split(datetimeindex):
             if verbose:
-                print("Iteration: %s, Train size: %s, Test size: %s, Data size: %s " % (
-                    counter, len(train), len(test), len(datetimeindex)))
+                print(
+                    "Iteration: %s, Train size: %s, Test size: %s, Data size: %s "
+                    % (counter, len(train), len(test), len(datetimeindex))
+                )
 
             X_train = _slice_set(X, datetimeindex[train])
             y_train = _slice_set(y, datetimeindex[train])
@@ -128,9 +165,18 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
             X_test = _slice_set(X, datetimeindex[test])
             y_test = _slice_set(y, datetimeindex[test])
 
-            metrics = eval_one_model(X_train, y_train, X_test, y_test,
-                                     model, window_size_for_metrics,
-                                     label_col_name, prediction_col_name, value_col_name, return_final_metrics=False)
+            metrics = eval_one_model(
+                X_train,
+                y_train,
+                X_test,
+                y_test,
+                model,
+                window_size_for_metrics,
+                label_col_name,
+                prediction_col_name,
+                value_col_name,
+                return_final_metrics=False,
+            )
             metrics = _join_metrics(metrics, prev_metrics)
 
         final_metrics = get_final_metrics(metrics, summarized=True)
@@ -140,9 +186,18 @@ def eval_models_CV(X, y, models, label_col_name='label', prediction_col_name='pr
     return per_model_res
 
 
-def eval_one_model(X_train, y_train, X_test, y_test,
-                   model, window_size_for_metrics,
-                   label_col_name='label', prediction_col_name='prediction', value_col_name='value',return_final_metrics=True):
+def eval_one_model(
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    model,
+    window_size_for_metrics,
+    label_col_name="label",
+    prediction_col_name="prediction",
+    value_col_name="value",
+    return_final_metrics=True,
+):
     """
     Returns metrics for one model and one pair of train/test sets.
     :param X_train: training set DataFrame
@@ -158,16 +213,21 @@ def eval_one_model(X_train, y_train, X_test, y_test,
     """
     if (y_test is not None) and (len(y_test) > 0):
         # run the model
-        print('Fitting...')
+        print("Fitting...")
         model.fit(X=X_train, y=y_train)
-        print('Predicting...')
+        print("Predicting...")
         prediction = model.predict(X=X_test)
 
         # evaluate results, aggregate raw_metrics
-        raw_metrics = get_metrics_for_all_categories(X_test, prediction, y_test,
-                                                     value_col_name=value_col_name, label_col_name=label_col_name,
-                                                     prediction_col_name=prediction_col_name,
-                                                     window_size_for_metrics=window_size_for_metrics)
+        raw_metrics = get_metrics_for_all_categories(
+            X_test,
+            prediction,
+            y_test,
+            value_col_name=value_col_name,
+            label_col_name=label_col_name,
+            prediction_col_name=prediction_col_name,
+            window_size_for_metrics=window_size_for_metrics,
+        )
 
     if return_final_metrics:
         final_metrics = get_final_metrics(raw_metrics, summarized=False)

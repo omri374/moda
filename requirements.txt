@@ -1,0 +1,8 @@
+numpy~=1.19.0
+stldecompose~=0.0.5
+pandas~=1.0.5
+scipy~=1.5.0
+statsmodels==0.10.2
+requests~=2.24.0
+pytest~=5.4.3
+scikit_learn~=0.23.0

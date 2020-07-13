@@ -7,7 +7,7 @@ def _initialize_metrics_dict():
     Initialize the metrics dictionary for one category
     :return: An empty metrics dictionary
     """
-    metrics = {'TP': 0, 'FP': 0, 'FN': 0, 'num_samples': 0, 'num_values': 0}
+    metrics = {"TP": 0, "FP": 0, "FN": 0, "num_samples": 0, "num_values": 0}
     return metrics
 
 
@@ -53,9 +53,9 @@ def calculate_metrics_with_shift(predicted, actual, window_size=3):
                             found = True
 
                 if found:
-                    metrics['TP'] += 1
+                    metrics["TP"] += 1
                 else:
-                    metrics['FN'] += 1
+                    metrics["FN"] += 1
             prev = act
 
     # Iterate over all positive predictions, and look for corresponding labels in the window
@@ -70,13 +70,20 @@ def calculate_metrics_with_shift(predicted, actual, window_size=3):
                             found = True
 
                 if not found:
-                    metrics['FP'] += 1
+                    metrics["FP"] += 1
             prev = pred
     return metrics
 
 
-def _get_metrics_for_one_category(dataset, label_col_name, prediction_col_name, value_col_name,
-                                  window_size_for_metrics, category="", prev_metrics=None):
+def _get_metrics_for_one_category(
+    dataset,
+    label_col_name,
+    prediction_col_name,
+    value_col_name,
+    window_size_for_metrics,
+    category="",
+    prev_metrics=None,
+):
     """
     Returns metrics for a specific category in the data.
     :param dataset: A dataset holding the prediction, actual and value columns.
@@ -95,34 +102,44 @@ def _get_metrics_for_one_category(dataset, label_col_name, prediction_col_name, 
     category_results = dataset.loc[pd.IndexSlice[:, category], :]
     category_results.index = category_results.index.remove_unused_levels()
     # Calculate TP, FP and FN
-    new_metrics = calculate_metrics_with_shift(predicted=category_results[prediction_col_name].values,
-                                               actual=category_results[label_col_name].values,
-                                               window_size=window_size_for_metrics)
+    new_metrics = calculate_metrics_with_shift(
+        predicted=category_results[prediction_col_name].values,
+        actual=category_results[label_col_name].values,
+        window_size=window_size_for_metrics,
+    )
     # Calculate additional accumulators
-    new_metrics['num_samples'] += len(category_results)
-    new_metrics['num_values'] += np.sum(category_results[value_col_name])
-    if 'TP' not in new_metrics:
-        new_metrics['TP']=np.NaN
-    if 'FP' not in new_metrics:
-        new_metrics['FP'] = np.NaN
-    if 'FN' not in new_metrics:
-        new_metrics['FN'] = np.NaN
+    new_metrics["num_samples"] += len(category_results)
+    new_metrics["num_values"] += np.sum(category_results[value_col_name])
+    if "TP" not in new_metrics:
+        new_metrics["TP"] = np.NaN
+    if "FP" not in new_metrics:
+        new_metrics["FP"] = np.NaN
+    if "FN" not in new_metrics:
+        new_metrics["FN"] = np.NaN
     new_metrics = _join_metrics(new_metrics, prev_metrics)
 
     return new_metrics
 
 
 def _join_pred_to_dataset(original_df, prediction_df, test_values_df, label_col_name):
-    results = pd.merge(prediction_df, original_df, how='left', on=['date', 'category'])[['prediction', label_col_name]]
-    results = pd.merge(results, test_values_df, how='left', on=['date', 'category'])
+    results = pd.merge(prediction_df, original_df, how="left", on=["date", "category"])[
+        ["prediction", label_col_name]
+    ]
+    results = pd.merge(results, test_values_df, how="left", on=["date", "category"])
     results[label_col_name] = results[label_col_name].fillna(0)
-    results.sort_index(level=['date', 'category'], ascending=True, inplace=True)
+    results.sort_index(level=["date", "category"], ascending=True, inplace=True)
     return results
 
 
-def get_metrics_for_all_categories(test_values_df, prediction_df, labels_df, value_col_name='value',
-                                   label_col_name='label', prediction_col_name='prediction',
-                                   window_size_for_metrics=5):
+def get_metrics_for_all_categories(
+    test_values_df,
+    prediction_df,
+    labels_df,
+    value_col_name="value",
+    label_col_name="label",
+    prediction_col_name="prediction",
+    window_size_for_metrics=5,
+):
     """
     Evalutes a model with a specific set of raw_metrics,
     :param label_col_name: The name of the label column in the testing data
@@ -141,11 +158,19 @@ def get_metrics_for_all_categories(test_values_df, prediction_df, labels_df, val
     all_metrics = {}
 
     # join the model results and test set, assuming that some dates or times are missing
-    dataset = _join_pred_to_dataset(labels_df, prediction_df, test_values_df, label_col_name)
+    dataset = _join_pred_to_dataset(
+        labels_df, prediction_df, test_values_df, label_col_name
+    )
     # print(results)
     for category in dataset.index.levels[1]:
-        cat_metrics = _get_metrics_for_one_category(dataset, label_col_name, prediction_col_name,
-                                                    value_col_name, window_size_for_metrics, category)
+        cat_metrics = _get_metrics_for_one_category(
+            dataset,
+            label_col_name,
+            prediction_col_name,
+            value_col_name,
+            window_size_for_metrics,
+            category,
+        )
         all_metrics[category] = cat_metrics
 
     return all_metrics
@@ -159,7 +184,9 @@ def _join_metrics(metrics1, metrics2):
 
     for category in metrics1:
         if category in metrics2:
-            metrics1[category] = _join_raw_metrics(metrics1[category], metrics2[category])
+            metrics1[category] = _join_raw_metrics(
+                metrics1[category], metrics2[category]
+            )
 
     for category in metrics2:
         if category not in metrics1:
@@ -172,11 +199,11 @@ def _join_metrics(metrics1, metrics2):
 
 def _join_raw_metrics(raw1, raw2):
     raw = {}
-    raw['TP'] = raw1['TP'] + raw2['TP']
-    raw['FP'] = raw1['FP'] + raw2['FP']
-    raw['FN'] = raw1['FN'] + raw2['FN']
-    raw['num_samples'] = raw1['num_samples'] + raw2['num_samples']
-    raw['num_values'] = raw1['num_values'] + raw2['num_values']
+    raw["TP"] = raw1["TP"] + raw2["TP"]
+    raw["FP"] = raw1["FP"] + raw2["FP"]
+    raw["FN"] = raw1["FN"] + raw2["FN"]
+    raw["num_samples"] = raw1["num_samples"] + raw2["num_samples"]
+    raw["num_values"] = raw1["num_values"] + raw2["num_values"]
 
     return raw
 
@@ -197,45 +224,52 @@ def get_final_metrics(raw_metrics, summarized=False):
     num_samples = 0
     final_metrics = dict()
 
-
     for category in raw_metrics:
-        category_tp = raw_metrics[category]['TP']
-        category_fp = raw_metrics[category]['FP']
-        category_fn = raw_metrics[category]['FN']
+        category_tp = raw_metrics[category]["TP"]
+        category_fp = raw_metrics[category]["FP"]
+        category_fn = raw_metrics[category]["FN"]
 
         final_metrics[category] = {}
 
         if category_tp > 0:
-            final_metrics[category]['precision'] = category_tp / (category_tp + category_fp)
-            final_metrics[category]['recall'] = category_tp / (category_tp + category_fn)
-            final_metrics[category]['f1'] = f_beta(final_metrics[category]['precision'],
-                                                     final_metrics[category]['recall'], 1
-
-
-                                                     )
-        if 'num_values' in raw_metrics[category]:
-            final_metrics[category]['num_values'] = raw_metrics[category]['num_values']
-        if 'num_samples' in raw_metrics[category]:
-            final_metrics[category]['num_samples'] = raw_metrics[category]['num_samples']
+            final_metrics[category]["precision"] = category_tp / (
+                category_tp + category_fp
+            )
+            final_metrics[category]["recall"] = category_tp / (
+                category_tp + category_fn
+            )
+            final_metrics[category]["f1"] = f_beta(
+                final_metrics[category]["precision"],
+                final_metrics[category]["recall"],
+                1,
+            )
+        if "num_values" in raw_metrics[category]:
+            final_metrics[category]["num_values"] = raw_metrics[category]["num_values"]
+        if "num_samples" in raw_metrics[category]:
+            final_metrics[category]["num_samples"] = raw_metrics[category][
+                "num_samples"
+            ]
 
         tp += category_tp
         fp += category_fp
         fn += category_fn
-        num_values += final_metrics[category]['num_values']
-        num_samples += final_metrics[category]['num_samples']
+        num_values += final_metrics[category]["num_values"]
+        num_samples += final_metrics[category]["num_samples"]
 
     if (tp + fp) > 0:
-        final_metrics['precision'] = tp / (tp + fp)
+        final_metrics["precision"] = tp / (tp + fp)
     else:
-        final_metrics['precision'] = np.nan
+        final_metrics["precision"] = np.nan
     if (tp + fn) > 0:
-        final_metrics['recall'] = tp / (tp + fn)
+        final_metrics["recall"] = tp / (tp + fn)
     else:
-        final_metrics['recall'] = np.nan
-    final_metrics['f1'] = f_beta(final_metrics['precision'], final_metrics['recall'], 1)
-    final_metrics['f0.5'] = f_beta(final_metrics['precision'], final_metrics['recall'], 0.5)
-    final_metrics['num_values'] = num_values
-    final_metrics['num_samples'] = num_samples
+        final_metrics["recall"] = np.nan
+    final_metrics["f1"] = f_beta(final_metrics["precision"], final_metrics["recall"], 1)
+    final_metrics["f0.5"] = f_beta(
+        final_metrics["precision"], final_metrics["recall"], 0.5
+    )
+    final_metrics["num_values"] = num_values
+    final_metrics["num_samples"] = num_samples
 
     if summarized:
         return summarize_metrics(final_metrics)
@@ -249,7 +283,14 @@ def summarize_metrics(all_metrics):
     :param all_metrics:
     :return:
     """
-    metric_names = ['f1', 'recall', 'precision', 'f0.5', 'num_samples','num_metrics']  # The keys to keep
+    metric_names = [
+        "f1",
+        "recall",
+        "precision",
+        "f0.5",
+        "num_samples",
+        "num_metrics",
+    ]  # The keys to keep
     return dict((k, all_metrics[k]) for k in metric_names if k in all_metrics)
 
 
