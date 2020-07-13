@@ -1,7 +1,7 @@
 # Moda
 ## Models and evaluation framework for trending topics detection and anomaly detection.
 
-
+![CI](https://github.com/omri374/moda/workflows/CI/badge.svg?branch=master)
 
 Moda provides an interface for evaluating models on either univariate or multi-category time-series datasets. It further allows the user to add additional models using a scikit-learn style API. All models provided in Moda were adapted to a multi-category scenario using by wrapping a univariate model to run on multiple categories. It further allows the evaluation of models using either a train/test split or a time-series cross validation.
 
