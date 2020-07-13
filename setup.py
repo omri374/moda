@@ -11,7 +11,7 @@ setup(
     name='moda',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.2.2',
+    version='0.3.0',
     packages=['moda.dataprep',
               'moda.evaluators',
               'moda.models'
@@ -21,7 +21,7 @@ setup(
     author='Omri Mendels',
     author_email='omri.mendels@microsoft.com',
     description='Tools for analyzing trending topics',
-    install_requires=['numpy', 'pandas', 'stldecompose', 'statsmodels', 'comet_ml', 'requests', 'matplotlib', 'pytest',
-                      'pytest-cov']
+    install_requires=['numpy', 'pandas', 'stldecompose', 'statsmodels==0.10.2', 'comet_ml', 'requests', 'matplotlib', 'pytest',
+                      'scikit_learn==0.23.0', 'pytest-cov']
 
 )

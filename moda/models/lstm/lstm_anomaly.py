@@ -5,7 +5,11 @@ import time
 
 import numpy as np
 import pandas as pd
-from keras.backend import clear_session
+try:
+    from keras.backend import clear_session
+except ImportError:
+    print("keras is not installed, install keras manually")
+
 
 from moda.dataprep.create_dataset import get_windowed_ts, split_history_and_current
 from moda.models.trend_detector import AbstractTrendDetector
@@ -34,7 +38,7 @@ class LSTMTrendinessDetector(AbstractTrendDetector):
         Whether to add missing dates/times to time series prior to modeling
 
     min_periods : numeric
-        The minimum value of periods for which to attemp to model. A time series shorter than that will return prediction = 0 
+        The minimum value of periods for which to attemp to model. A time series shorter than that will return prediction = 0
 
     lookback : String
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
