@@ -34,7 +34,6 @@ ranged_ts = ts_to_range(ts,time_range=TIME_RANGE)
 
 ### Model evaluation
 
-Example for a train/test split and evaluation
 ```python
 from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
 from moda.dataprep import read_data
