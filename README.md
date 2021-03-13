@@ -3,7 +3,7 @@
 
 ![CI](https://github.com/omri374/moda/workflows/CI/badge.svg?branch=master)
 
-Moda provides an interface for evaluating models on either univariate or multi-category time-series datasets. It further allows the user to add additional models using a scikit-learn style API. All models provided in Moda were adapted to a multi-category scenario using by wrapping a univariate model to run on multiple categories. It further allows the evaluation of models using either a train/test split or a time-series cross validation.
+Moda provides an interface for evaluating models on either univariate or multi-category time-series datasets. It further allows the user to add additional models by using a scikit-learn style API. All models provided in Moda were adapted to a multi-category scenario using by wrapping a univariate model to run on multiple categories. It further allows the evaluation of models using either a train/test split or a time-series cross validation.
 
 ## Installation
 `pip install moda`
@@ -20,7 +20,7 @@ from moda.dataprep import raw_to_ts, ts_to_range
 
 DATAPATH = "example/SF_data/SF311-2008.csv"
 # The full dataset can be downloaded from here: https://data.sfgov.org/City-Infrastructure/311-Cases/vw6y-z8j6/data
-TIME_RANGE = "24H" # Aggregate all events in the raw data into 3 hour intervals
+TIME_RANGE = "24H" # Aggregate all events in the raw data into 24 hours intervals
 
 # Read raw file
 raw = pd.read_csv(DATAPATH)
