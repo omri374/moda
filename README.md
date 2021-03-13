@@ -32,29 +32,6 @@ ts = raw_to_ts(raw)
 ranged_ts = ts_to_range(ts,time_range=TIME_RANGE)
 ```
 
-### Run a model:
-
-Run one model, and extract metrics using a manually labeled set
-```python
-from moda.evaluators import get_metrics_for_all_categories, get_final_metrics
-from moda.dataprep import read_data
-from moda.models import STLTrendinessDetector
-
-model = STLTrendinessDetector(freq='24H', 
-                              min_value=10,
-                              anomaly_type='residual',
-                              num_of_std=3, lo_delta=0)
-
-# Take the entire time series and evaluate anomalies on all of it or just the last window(s)
-prediction = model.predict(dataset)
-raw_metrics = get_metrics_for_all_categories(dataset[['value']], prediction[['prediction']], dataset[['label']],
-                                             window_size_for_metrics=1)
-metrics = get_final_metrics(raw_metrics)
-
-## Plot results for each category
-model.plot(labels=dataset['label'])
-```
-
 ### Model evaluation
 
 Example for a train/test split and evaluation
