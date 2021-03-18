@@ -1,4 +1,4 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 # read the contents of the README file
 from os import path
@@ -12,10 +12,10 @@ setup(
     long_description=long_description,
     long_description_content_type='text/markdown',
     version='0.3.0',
-    packages=['moda.dataprep',
-              'moda.evaluators',
-              'moda.models'
-              ],
+    packages=find_packages(include=['moda.dataprep',
+                                    'moda.evaluators',
+                                    'moda.models',
+                                    'moda.models.*', ]),
     url='https://www.github.com/omri374/moda',
     license='MIT',
     author='Omri Mendels',
