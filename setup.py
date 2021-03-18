@@ -11,7 +11,7 @@ setup(
     name='moda',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    version='0.3.0',
+    version='0.3.2',
     packages=find_packages(include=['moda.dataprep',
                                     'moda.evaluators',
                                     'moda.models',

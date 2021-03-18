@@ -1,12 +1,12 @@
 import json
 import os
 
+from moda.dataprep import read_data
 from moda.evaluators import (
     get_metrics_for_all_categories,
     get_final_metrics,
     evaluate_all_models,
 )
-from moda.dataprep import read_data
 from moda.models import (
     TwitterAnomalyTrendinessDetector,
     MovingAverageSeasonalTrendinessDetector,
@@ -145,3 +145,6 @@ if __name__ == "__main__":
     if inp1 == "e":
         print("Loading file {0}. Evaluating all models".format(datapath))
         evaluate_all_models(datapath=datapath, freq=freqs[freq])
+
+if __name__ == "__main__":
+    run

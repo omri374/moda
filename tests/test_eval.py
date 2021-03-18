@@ -7,7 +7,7 @@ import pytest
 
 from moda.evaluators.eval import eval_models, eval_models_CV
 from moda.dataprep.data_reader import read_data
-from moda.models.ma_seasonal import MovingAverageSeasonalTrendinessDetector
+from moda.models import MovingAverageSeasonalTrendinessDetector
 from tests.mock_model import MockModel
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))

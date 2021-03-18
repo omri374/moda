@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 
-from moda.models.trend_detector import AbstractTrendDetector
+from moda.models.trend_detector import TrendDetector
 
 
-class MockModel(AbstractTrendDetector):
+class MockModel(TrendDetector):
 
     __name__ = 'MockModel'
 

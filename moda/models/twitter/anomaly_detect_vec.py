@@ -1,6 +1,6 @@
-'''
+"""
 Note: code originally from : https://github.com/Marcnuth/AnomalyDetection
-'''
+"""
 
 import numpy as np
 import scipy as sp
@@ -9,7 +9,7 @@ import datetime
 import statsmodels.api as sm
 from moda.models.twitter import anomaly_detect_ts
 
-'''
+"""
 Description:
 
      A technique for detecting anomalies in seasonal univariate time
@@ -21,7 +21,7 @@ Usage:
        period = NULL, only_last = F, threshold = "None", e_value = F,
        longterm_period = NULL, plot = F, y_log = F, xlabel = "",
        ylabel = "count", title = NULL, verbose = FALSE)
-     
+
 Arguments:
 
        x: Time series as a column data frame, list, or vector, where
@@ -132,55 +132,82 @@ Examples:
      # To detect only the anomalies in the last period, run the following:
      AnomalyDetectionVec(raw_data[,2], max_anoms=0.02, period=1440, direction="bot",
      only_last=TRUE, plot=TRUE)
-     
 
 
 
-'''
+
+"""
 
 
-def __verbose_if(condition, args,kwargs):
+def __verbose_if(condition, args, kwargs):
     if condition:
         print(args)
         print(kwargs)
 
 
-def anomaly_detect_vec(x, max_anoms=0.1, direction="pos", alpha=0.05,
-                       period=None, only_last=False, threshold=None, e_value=False,
-                       longterm_period=None, plot=False, y_log=False, xlabel="",
-                       ylabel="count", title="", verbose=False):
+def anomaly_detect_vec(
+    x,
+    max_anoms=0.1,
+    direction="pos",
+    alpha=0.05,
+    period=None,
+    only_last=False,
+    threshold=None,
+    e_value=False,
+    longterm_period=None,
+    plot=False,
+    y_log=False,
+    xlabel="",
+    ylabel="count",
+    title="",
+    verbose=False,
+):
 
-    assert isinstance(x) == pd.Series, 'x must be pandas series'
-    assert max_anoms < 0.5, 'max_anoms must be < 0.5'
-    assert direction in ['pos', 'neg', 'both'], 'direction should be one of "pos", "neg", "both"'
+    assert isinstance(x) == pd.Series, "x must be pandas series"
+    assert max_anoms < 0.5, "max_anoms must be < 0.5"
+    assert direction in [
+        "pos",
+        "neg",
+        "both",
+    ], 'direction should be one of "pos", "neg", "both"'
     assert period, "Period must be set to the number of data points in a single period"
 
-    __verbose_if((alpha < 0.01 or alpha > 0.1) and verbose,
-                 "Warning: alpha is the statistical signifigance, and is usually between 0.01 and 0.1")
+    __verbose_if(
+        (alpha < 0.01 or alpha > 0.1) and verbose,
+        "Warning: alpha is the statistical signifigance, and is usually between 0.01 and 0.1",
+    )
 
     max_anoms = 1.0 / x.size if max_anoms < 1.0 / x.size else max_anoms
 
     step = int(np.ceil(x.size / longterm_period)) if longterm_period else x.size
-    all_data = [x.iloc[i:i + step] for i in range(0, x.size, step)]
+    all_data = [x.iloc[i : i + step] for i in range(0, x.size, step)]
 
-    one_tail = True if direction in ['pos', 'neg'] else False
-    upper_tail = True if direction in ['pos', 'both'] else False
+    one_tail = True if direction in ["pos", "neg"] else False
+    upper_tail = True if direction in ["pos", "both"] else False
 
     all_anoms = pd.Series()
     seasonal_plus_trend = pd.Series()
     for ts in all_data:
         tmp = anomaly_detect_ts._detect_anoms(
-            ts, k=max_anoms, alpha=alpha, num_obs_per_period=period, use_decomp=True,
-            use_esd=False, direction=direction, verbose=verbose)
+            ts,
+            k=max_anoms,
+            alpha=alpha,
+            num_obs_per_period=period,
+            use_decomp=True,
+            use_esd=False,
+            direction=direction,
+            verbose=verbose,
+        )
 
-        s_h_esd_timestamps = tmp['anoms']
-        data_decomp = tmp['stl']
+        s_h_esd_timestamps = tmp["anoms"]
+        data_decomp = tmp["stl"]
 
         anoms = ts.loc[s_h_esd_timestamps]
         if threshold:
             end = longterm_period - 1 if longterm_period else x.size - 1
-            periodic_maxs = [ts.iloc[i: i + period].max()
-                             for i in range(0, end, period)]
+            periodic_maxs = [
+                ts.iloc[i : i + period].max() for i in range(0, end, period)
+            ]
 
             if threshold == "med_max":
                 thresh = periodic_maxs.median()
@@ -195,4 +222,3 @@ def anomaly_detect_vec(x, max_anoms=0.1, direction="pos", alpha=0.05,
 
     all_anoms.drop_duplicates(inplace=True)
     seasonal_plus_trend.drop_duplicates(inplace=True)
-

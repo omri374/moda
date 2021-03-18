@@ -1,7 +1,9 @@
 import pandas as pd
 
 
-def get_windowed_ts(ranged_ts, window_size, with_actual=True):
+def get_windowed_ts(
+    ranged_ts: pd.DataFrame, window_size: int, with_actual: bool = True
+):
     """
     Creates a data frame where each row is a window of samples from the time series.
     Each consecutive row is a shift of 1 cell from the previous row.
