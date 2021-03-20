@@ -3,6 +3,7 @@
 ## Models and evaluation framework for trending topics detection and anomaly detection
 
 ![CI](https://github.com/omri374/moda/workflows/CI/badge.svg?branch=master)
+[![PyPI package version](https://badge.fury.io/py/moda.svg)](https://badge.fury.io/py/moda.svg)
 
 Moda provides an interface for evaluating models on either univariate or multi-category
 time-series datasets. It further allows the user to add additional models by using
