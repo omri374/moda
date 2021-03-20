@@ -2,9 +2,12 @@ import numpy as np
 import pandas as pd
 
 
-def raw_to_ts(raw, min_date=None, max_date=None, date_format=None):
+def raw_to_ts(
+    raw, min_date: str = None, max_date: str = None, date_format: str = None
+) -> pd.DataFrame:
     """
-    Turns a raw pd.DataFrame into a time-series DataFrame, by creating a DatetimeIndex and a 'timestamp' column
+    Turns a raw pd.DataFrame into a time-series DataFrame, by creating a DatetimeIndex and a 'timestamp' column.
+
     :param raw: a pd.DataFrame with a date column
     :param min_date: Minimum date for the time series
     :param max_date: Maximum date for the time series
@@ -27,9 +30,10 @@ def raw_to_ts(raw, min_date=None, max_date=None, date_format=None):
     return raw
 
 
-def ts_to_range(ts, time_range="1H", pad_with_zeros=True):
+def ts_to_range(ts: pd.DataFrame, time_range: str = "1H", pad_with_zeros: bool = True):
     """
-    Creates a new data frame with counts per time range
+    Creates a new data frame with counts per time range.
+
     :param ts: The original time series, with a column named 'date' and possibly an additional 'category' column
     :param time_range: The time range requested
     :param pad_with_zeros: Whether to add a value of 0 for missing dates (see Pandas resample).

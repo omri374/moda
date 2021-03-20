@@ -17,18 +17,22 @@ from moda.models import MovingAverageSeasonalTrendinessDetector
 from moda.models import STLTrendinessDetector
 from moda.models import TwitterAnomalyTrendinessDetector
 
+try:
+    from comet_ml import Experiment
+except ImportError:
+    print("comet_ml needs to be downloaded")
 
 def evaluate_all_models(
     datapath="SF3H_labeled.csv",
     min_date="01-01-2018",
     freq="3H",
     use_comet=False,
-    models_to_run=[],
+    models_to_run=None,
     window_size_for_metrics=1,
 ):
     try:
         dataset = read_data(datapath, min_date=min_date)
-    except:
+    except Exception:
         print("File not found or failed to read")
         return
     dataset = dataset[~dataset.index.duplicated(keep="first")]
@@ -115,6 +119,7 @@ def evaluate_all_models(
     # STL model
     if "stl" in models_to_run or len(models_to_run) == 0:
         print("Evaluating STL model")
+        anomaly_types = ["residual", "trend", "and", "or"]
         for num_std in [2.5, 3, 3.5, 4]:
             for anomaly_type in anomaly_types:
                 for lo_frac in [0.1, 0.5, 1, 1.5]:
@@ -374,7 +379,6 @@ def get_azure_subscription_key(file):
         raise Exception(
             "Error loading Azure subscription key for Azure Anomaly Finder.\n"
             "Please create a json file and put your subscription_key value in it.\n"
-            "See https://docs.microsoft.com/en-us/azure/machine-learning/team-data-science-process/apps-anomaly-detection-api\n"
             + str(e)
         )
 

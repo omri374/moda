@@ -3,7 +3,7 @@ import os
 
 import pandas as pd
 from moda.dataprep.data_reader import read_data
-from moda.models.stl.stl_model import STLTrendinessDetector
+from moda.models.stl_model import STLTrendinessDetector
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
 

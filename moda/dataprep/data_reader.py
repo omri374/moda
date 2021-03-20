@@ -1,22 +1,22 @@
 import pandas as pd
 
 
-def read_data(path, min_date=None, max_date=None):
+def read_data(path: str, min_date=None, max_date=None) -> pd.DataFrame:
     """Reads data to be fed into the model.
 
-     Parameters
-     ----------
-     path : String
-         path to the CSV fie containing the data to be modeled. The file should contain a date/time column, a category column and the value for this category and this date/time.
+    :param path: Path to the CSV fie containing the data to be modeled.
+        The file should contain a date/time column,
+        a category column and the value for this category and this date/time.
 
-     Returns
-     -------
-     df : pandas.DataFrame
-         Returns a pandas DataFrame with a two-leveled multi-index, the first
-            indexing time and the second indexing class/topic frequency
-            per-window, and a single column of a numeric dtype, giving said
-            frequency.
-     """
+    :param min_date: Minimum date to return data for. Example: "01-01-2018"
+
+    :param max_date: Maximum date to return data for. Example: "01-01-2019"
+
+    :returns A pandas DataFrame with a two-leveled multi-index, the first
+           indexing time and the second indexing class/topic frequency
+           per-window, and a single column of a numeric dtype, giving said
+           frequency.
+    """
 
     import os.path
 

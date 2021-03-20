@@ -6,7 +6,7 @@ from statsmodels.tsa.seasonal import seasonal_decompose
 from moda.models.trend_detector import *
 
 
-class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
+class MovingAverageSeasonalTrendinessDetector(TrendDetector):
     __name__ = 'MovingAverageSeasonalTrendinessDetector'
     """An detector for anomalies on time series using the seasonal_decompose method
 
@@ -24,12 +24,12 @@ class MovingAverageSeasonalTrendinessDetector(AbstractTrendDetector):
 
     anomaly_type: String
         The values on which anomalies are looked for. Possible values are ['trend', 'residual', 'and', 'or']
-        
+
     resample : bool
         Whether to add missing dates/times to time series prior to modeling
-        
+
     min_periods : numeric
-        The minimum value of periods for which to attemp to model. A time series shorter than that will return prediction = 0 
+        The minimum value of periods for which to attemp to model. A time series shorter than that will return prediction = 0
 
     lookback : String
         The time for which statistics for a specific timestamp look back. i.e. A sliding window for statistics (median, std). Example: '30D','12H' etc.
