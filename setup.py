@@ -35,7 +35,7 @@ setup(
         "requests",
         "matplotlib",
         "pytest",
-        "scikit_learn==0.23.0",
+        "scikit_learn==1.5.0",
         "pytest-cov",
     ],
 )
